@@ -1,0 +1,7 @@
+{
+    "ui_defs": [
+        "ui/mark_hud.json",
+        "ui/mark_point.json",
+        "ui/netease_editor_template_namespace.json"
+    ]
+}

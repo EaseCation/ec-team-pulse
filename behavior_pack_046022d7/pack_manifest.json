@@ -1,0 +1,31 @@
+{
+  "modules": [
+    {
+      "description": "ECTeamPulse",
+      "type": "data",
+      "uuid": "b2904422-1a81-437d-9f73-3bcb02eec0cc",
+      "version": [
+        0,
+        0,
+        1
+      ]
+    }
+  ],
+  "header": {
+    "description": "ECTeamPulse",
+    "name": "behavior_pack",
+    "uuid": "046022d7-95ce-4881-b49d-0884139dcd47",
+    "version": [
+      0,
+      0,
+      1
+    ],
+    "min_engine_version": [
+      1,
+      18,
+      0
+    ]
+  },
+  "dependencies": [],
+  "format_version": 1
+}

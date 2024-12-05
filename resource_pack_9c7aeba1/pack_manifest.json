@@ -1,0 +1,30 @@
+{
+  "modules": [
+    {
+      "description": "ECTeamPulse",
+      "type": "resources",
+      "uuid": "fe552226-8900-4f79-a5e0-ef0510b2c062",
+      "version": [
+        0,
+        0,
+        1
+      ]
+    }
+  ],
+  "header": {
+    "description": "ECTeamPulse",
+    "name": "resource_pack",
+    "uuid": "9c7aeba1-f61e-453e-ac1d-148eaa7df3b1",
+    "version": [
+      0,
+      0,
+      1
+    ],
+    "min_engine_version": [
+      1,
+      18,
+      0
+    ]
+  },
+  "format_version": 1
+}

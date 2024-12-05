@@ -1,0 +1,55 @@
+{
+   "main" : {
+      "controls" : [
+         {
+            "panel" : {
+               "controls" : [
+                  {
+                     "image" : {
+                        "alpha" : "@mark_point.mark_point_alpha",
+                        "clip_direction" : "left",
+                        "clip_ratio" : 0.0,
+                        "layer" : 1,
+                        "offset" : "@mark_point.mark_point_offset",
+                        "size" : "@mark_point.mark_point_size",
+                        "texture" : "textures/ui/ec_mark/mark_rhombus",
+                        "type" : "image"
+                     }
+                  }
+               ],
+               "layer" : 1,
+               "max_size" : [ 12, 12 ],
+               "min_size" : [ 4, 4 ],
+               "size" : [ 8, 8 ],
+               "type" : "panel"
+            }
+         }
+      ],
+      "type" : "screen"
+   },
+   "mark_point_alpha" : {
+      "anim_type" : "alpha",
+      "duration" : 1.0,
+      "easing" : "out_cubic",
+      "from" : 0.0,
+      "next" : "",
+      "to" : 0.80
+   },
+   "mark_point_offset" : {
+      "anim_type" : "offset",
+      "duration" : 0.50,
+      "easing" : "out_cubic",
+      "from" : [ 0.0, -15.0 ],
+      "next" : "",
+      "to" : [ 0.0, 0.0 ]
+   },
+   "mark_point_size" : {
+      "anim_type" : "size",
+      "duration" : 0.50,
+      "easing" : "out_cubic",
+      "from" : [ "500%", "500%" ],
+      "next" : "",
+      "to" : [ "100%", "100%" ]
+   },
+   "namespace" : "mark_point"
+}

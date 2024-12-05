@@ -1,0 +1,75 @@
+{
+   "main@common.base_screen" : {
+      "$screen_content" : "mark_hud.mark_hud"
+   },
+   "mark_hud" : {
+      "controls" : [
+         {
+            "btn_mark@common.button" : {
+               "$control_alpha" : 0.50,
+               "$default_texture" : "textures/ui/hud_tip_text_background",
+               "$hover_texture" : "textures/ui/hud_tip_text_background",
+               "$is_new_nine_slice" : false,
+               "$label_color" : [ 1, 1, 1 ],
+               "$label_font_scale_factor" : 1.0,
+               "$label_font_size" : "large",
+               "$label_layer" : 3,
+               "$label_offset" : [ 0, 0 ],
+               "$label_text" : "",
+               "$nine_slice_buttom" : 0,
+               "$nine_slice_left" : 0,
+               "$nine_slice_right" : 0,
+               "$nine_slice_top" : 0,
+               "$nineslice_size" : [ 0, 0, 0, 0 ],
+               "$pressed_button_name" : "%netease_editor_template_namespace.click",
+               "$pressed_texture" : "textures/ui/hud_tip_text_background",
+               "$texture_layer" : 2,
+               "anchor_from" : "top_right",
+               "anchor_to" : "top_right",
+               "bindings" : [
+                  {
+                     "binding_collection_name" : "",
+                     "binding_condition" : "always_when_visible",
+                     "binding_type" : "collection_details"
+                  }
+               ],
+               "button_mappings" : [],
+               "controls" : [
+                  {
+                     "default@netease_editor_template_namespace.default" : {}
+                  },
+                  {
+                     "hover@netease_editor_template_namespace.hover" : {}
+                  },
+                  {
+                     "pressed@netease_editor_template_namespace.pressed" : {}
+                  },
+                  {
+                     "button_label@netease_editor_template_namespace.button_label" : {}
+                  },
+                  {
+                     "image" : {
+                        "clip_direction" : "left",
+                        "clip_ratio" : 0.0,
+                        "layer" : 10,
+                        "size" : [ 4.0, 7.0 ],
+                        "texture" : "textures/ui/ec_mark/mark_icon",
+                        "type" : "image"
+                     }
+                  }
+               ],
+               "default_control" : "default",
+               "hover_control" : "hover",
+               "is_handle_button_move_event" : true,
+               "offset" : [ -40.0, 40.0 ],
+               "pressed_control" : "pressed",
+               "size" : [ 10.0, 10.0 ],
+               "type" : "button"
+            }
+         }
+      ],
+      "layer" : 1,
+      "type" : "panel"
+   },
+   "namespace" : "mark_hud"
+}
