@@ -20,7 +20,7 @@ class ClientMarkPoint(MarkPoint):
             mark_point_ui_name,
             {
                 "isHud": 1,
-                "autoScale": 0,
+                "autoScale": 1,
                 "bindWorldPosition": (comp_game.GetCurrentDimension(), (self.pos[0], self.pos[1], self.pos[2])),
                 "color": self.color,
                 "texture": self.texture

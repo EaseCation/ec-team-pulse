@@ -7,6 +7,8 @@
                "controls" : [
                   {
                      "panel" : {
+                        "anchor_from" : "center",
+                        "anchor_to" : "center",
                         "controls" : [
                            {
                               "image" : {
@@ -33,8 +35,8 @@
                            },
                            {
                               "distance_label" : {
-                                 "anchor_from" : "bottom_middle",
-                                 "anchor_to" : "top_middle",
+                                 "anchor_from" : "top_middle",
+                                 "anchor_to" : "bottom_middle",
                                  "text" : "0.0m",
                                  "text_alignment" : "center",
                                  "type" : "label",
@@ -43,23 +45,29 @@
                            }
                         ],
                         "layer" : 1,
-                        "max_size" : [ 12, 12 ],
-                        "min_size" : [ 4, 4 ],
+                        "offset" : "@mark_point.mark_point_offset",
                         "size" : [ 8, 8 ],
                         "type" : "panel"
                      }
                   },
                   {
                      "padding" : {
-                        "size" : [ "default", 0.0 ],
-                        "type" : "panel"
+                        "alpha": "@mark_point.mark_point_padding_alpha",
+                        "anchor_from" : "center",
+                        "anchor_to" : "top_middle",
+                        "size" : "@mark_point.mark_point_padding_size",
+                        "type" : "image",
+                        "offset": "@mark_point.mark_point_padding_offset",
+                        "nineslice_size" : [ 0, 0, 0, 0 ],
+                        "is_new_nine_slice" : true,
+                        "texture": "textures/ui/ec_mark/mark_point_stick"
                      }
                   }
                ],
                "layer" : 1,
                "offset" : [ 0.0, 4.0 ],
-               "size" : [ 8.0, "default" ],
-               "type" : "stack_panel"
+               "size" : [ 8.0, 16.0 ],
+               "type" : "panel"
             }
          }
       ],
@@ -88,6 +96,38 @@
       "from" : [ "100%", "100%" ],
       "next" : "",
       "to" : [ "500%", "500%" ]
+   },
+   "mark_point_offset" : {
+      "anim_type" : "offset",
+      "duration" : 0.4,
+      "easing" : "out_cubic",
+      "from" : [ 0, 0 ],
+      "next" : "",
+      "to" : [ 0.0, "-100.0%+0.0px" ]
+   },
+   "mark_point_padding_alpha": {
+      "anim_type" : "alpha",
+      "duration" : 0.4,
+      "easing" : "out_cubic",
+      "from" : 0.0,
+      "next" : "",
+      "to" : 0.5
+   },
+   "mark_point_padding_offset" : {
+      "anim_type" : "offset",
+      "duration" : 0.4,
+      "easing" : "out_cubic",
+      "from" : [ 0, 0 ],
+      "next" : "",
+      "to" : [ 0.0, "-100.0%+4px" ]
+   },
+   "mark_point_padding_size" : {
+      "anim_type" : "size",
+      "duration" : 0.4,
+      "easing" : "out_cubic",
+      "from" : [ 2.0, "0.0%+0.0px" ],
+      "next" : "",
+      "to" : [ 2.0, "80.0%+0.0px" ]
    },
    "namespace" : "mark_point"
 }
