@@ -319,14 +319,17 @@ class RayHitTarget(object):
         return self.distanceSq < other.distanceSq
 
 class Raycaster(object):
-    def __init__(self, start, direction, maxDistance=120.0, maxBlockCollide=1, liquid=False, ignoreBarrier=False):
-        self.start = start.clone()
-        self.direction = direction.normalize()
-        self.maxDistance = maxDistance
-        self.liquid = liquid
-        self.ignoreBarrier = ignoreBarrier
-        self.maxBlockCollide = maxBlockCollide
-        self.end = self.start.add(self.direction.x * maxDistance, self.direction.y * maxDistance, self.direction.z * maxDistance)
+    def __init__(self, start, direction, maxDistance=120.0, maxBlockCollide=1, maxEntityCollide=1, liquid=False, ignoreBarrier=False, blacklistEntityIds=None, whitelistEntityIds=None):
+        self.start = start.clone()  # type: Vector3
+        self.direction = direction.normalize()  # type: Vector3
+        self.maxDistance = maxDistance  # type: float
+        self.liquid = liquid  # type: bool
+        self.ignoreBarrier = ignoreBarrier  # type: bool
+        self.maxBlockCollide = maxBlockCollide  # type: int
+        self.maxEntityCollide = maxEntityCollide  # type: int
+        self.blacklistEntityIds = blacklistEntityIds  # type: list[str] | None
+        self.whitelistEntityIds = whitelistEntityIds  # type: list[str] | None
+        self.end = self.start.add(self.direction.x * maxDistance, self.direction.y * maxDistance, self.direction.z * maxDistance)  # type: Vector3
 
         # Get levelId (dimension ID)
         gameComp = clientApi.GetEngineCompFactory().CreateGame(clientApi.GetLocalPlayerId())
@@ -335,7 +338,13 @@ class Raycaster(object):
         self.blockComp = clientApi.GetEngineCompFactory().CreateBlockInfo(self.levelId)
         self.gameComp = clientApi.GetEngineCompFactory().CreateGame(self.levelId)
 
-    def raytraceEntities(self, countLimit=1):
+    def raytraceEntities(self):
+        """
+        Raytrace entities in the path of the ray
+        :param countLimit:
+        :return: A list of RayHitTarget objects
+        @rtype: list[RayHitTarget]
+        """
         localPlayerId = clientApi.GetLocalPlayerId()
         minX = min(self.start.x, self.end.x)
         minY = min(self.start.y, self.end.y)
@@ -350,6 +359,10 @@ class Raycaster(object):
 
         targets = []
         for entityId in entities:
+            if self.whitelistEntityIds and entityId not in self.whitelistEntityIds:
+                continue
+            if self.blacklistEntityIds and entityId in self.blacklistEntityIds:
+                continue
             posComp = clientApi.GetEngineCompFactory().CreatePos(entityId)
             entityPos = Vector3(*posComp.GetPos())
             sizeComp = clientApi.GetEngineCompFactory().CreateCollisionBox(entityId)
@@ -371,20 +384,18 @@ class Raycaster(object):
                 hitResult.entityHit = entityId
                 distanceSq = self.start.distanceSquared(hitResult.hitVector)
                 targets.append(RayHitTarget(self, hitResult, distanceSq))
-                if len(targets) >= countLimit:
+                if len(targets) >= self.maxEntityCollide:
                     break
 
         return targets
 
-    def raytraceBlocks(self, countLimit=1):
+    def raytraceBlocks(self):
         targets = []
         iterator = BlockClipIterator(self.blockComp, self.start, self.end, self.liquid, self.ignoreBarrier, int(self.maxDistance * 3))
         while iterator.hasNext() and len(targets) < self.maxBlockCollide:
             hitResult = iterator.next()
             distanceSq = self.start.distanceSquared(hitResult.hitVector)
             targets.append(RayHitTarget(self, hitResult, distanceSq))
-            if len(targets) >= countLimit:
-                break
         return targets
 
     def raytraceAll(self):

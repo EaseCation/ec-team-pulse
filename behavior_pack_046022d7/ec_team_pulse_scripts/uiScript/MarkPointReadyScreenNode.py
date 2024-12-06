@@ -1,0 +1,43 @@
+# -*- coding: utf-8 -*-
+import time
+
+import mod.client.extraClientApi as clientApi
+ViewBinder = clientApi.GetViewBinderCls()
+ViewRequest = clientApi.GetViewViewRequestCls()
+ScreenNode = clientApi.GetScreenNodeCls()
+
+
+class MarkPointReadyScreenNode(ScreenNode):
+	def __init__(self, namespace, name, param):
+		ScreenNode.__init__(self, namespace, name, param)
+		self.destroy_time = time.time() + 1
+		self.removed = False
+
+	def Create(self):
+		"""
+		@description UI创建成功时调用
+		"""
+		pass
+
+	def Destroy(self):
+		"""
+		@description UI销毁时调用
+		"""
+		pass
+
+	def OnActive(self):
+		"""
+		@description UI重新回到栈顶时调用
+		"""
+		pass
+
+	def OnDeactive(self):
+		"""
+		@description 栈顶UI有其他UI入栈时调用
+		"""
+		pass
+
+	def Update(self):
+		if time.time() > self.destroy_time:
+			self.SetRemove()
+			self.removed = True

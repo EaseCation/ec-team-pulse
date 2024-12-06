@@ -2,54 +2,100 @@
    "main" : {
       "controls" : [
          {
-            "panel" : {
+            "stack_panel" : {
+               "anchor_to" : "bottom_middle",
                "controls" : [
                   {
-                     "image" : {
-                        "alpha" : "@mark_point.mark_point_alpha",
-                        "clip_direction" : "left",
-                        "clip_ratio" : 0.0,
+                     "panel" : {
+                        "controls" : [
+                           {
+                              "image" : {
+                                 "alpha" : "@mark_point.mark_point_alpha",
+                                 "clip_direction" : "left",
+                                 "clip_ratio" : 0.0,
+                                 "controls" : [],
+                                 "layer" : 2,
+                                 "size" : [ "100%", "100%" ],
+                                 "texture" : "textures/ui/ec_mark/mark_rhombus",
+                                 "type" : "image"
+                              }
+                           },
+                           {
+                              "bg" : {
+                                 "alpha" : "@mark_point.mark_point_bg_alpha",
+                                 "clip_direction" : "left",
+                                 "clip_ratio" : 0.0,
+                                 "layer" : 1,
+                                 "size" : "@mark_point.mark_point_bg_size",
+                                 "texture" : "textures/ui/ec_mark/mark_rhombus_bg",
+                                 "type" : "image"
+                              }
+                           }
+                        ],
                         "layer" : 1,
-                        "offset" : "@mark_point.mark_point_offset",
-                        "size" : "@mark_point.mark_point_size",
-                        "texture" : "textures/ui/ec_mark/mark_rhombus",
-                        "type" : "image"
+                        "max_size" : [ 12, 12 ],
+                        "min_size" : [ 4, 4 ],
+                        "size" : [ 8, 8 ],
+                        "type" : "panel"
+                     }
+                  },
+                  {
+                     "padding" : {
+                        "size" : [ "default", 0.0 ],
+                        "type" : "panel"
                      }
                   }
                ],
                "layer" : 1,
-               "max_size" : [ 12, 12 ],
-               "min_size" : [ 4, 4 ],
-               "size" : [ 8, 8 ],
-               "type" : "panel"
+               "size" : [ 8.0, "default" ],
+               "type" : "stack_panel"
             }
+         },
+         {
+            "tick_refresh_auxiliary@mark_point.tick_refresh_auxiliary": {}
          }
       ],
       "type" : "screen"
    },
    "mark_point_alpha" : {
       "anim_type" : "alpha",
-      "duration" : 1.0,
+      "duration" : 0.10,
       "easing" : "out_cubic",
       "from" : 0.0,
       "next" : "",
       "to" : 0.80
    },
-   "mark_point_offset" : {
-      "anim_type" : "offset",
-      "duration" : 0.50,
+   "mark_point_bg_alpha" : {
+      "anim_type" : "alpha",
+      "duration" : 0.40,
       "easing" : "out_cubic",
-      "from" : [ 0.0, -15.0 ],
+      "from" : 0.50,
       "next" : "",
-      "to" : [ 0.0, 0.0 ]
+      "to" : 0.0
    },
-   "mark_point_size" : {
+   "mark_point_bg_size" : {
       "anim_type" : "size",
       "duration" : 0.50,
       "easing" : "out_cubic",
-      "from" : [ "500%", "500%" ],
+      "from" : [ "100%", "100%" ],
       "next" : "",
-      "to" : [ "100%", "100%" ]
+      "to" : [ "500%", "500%" ]
+   },
+   "tick_refresh_auxiliary" : {
+      "type" : "label",
+      "layer": 1,
+      "anchor_from": "top_left",
+      "anchor_to": "top_left",
+      "offset": [0, 0],
+      "font_size": "small",
+      "text": "#text",
+      "bindings": [
+         {
+            "binding_name": "#tick_refresh_auxiliary",
+            "binding_condition": "always",
+            "binding_name_override": "#text"
+         }
+      ]
    },
    "namespace" : "mark_point"
 }
