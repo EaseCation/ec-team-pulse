@@ -8,17 +8,16 @@ comp_game = clientApi.GetEngineCompFactory().CreateGame(clientApi.GetLocalPlayer
 
 class ClientMarkPoint(MarkPoint):
 
-    def __init__(self, pos, mark_type, color, texture):
+    def __init__(self, session, pos, mark_type, color, texture):
         super(ClientMarkPoint, self).__init__(pos, mark_type, color, texture)
+        self.session = session
         self.ui_node = None  # type: MarkPointScreenNode | None
 
     def show(self):
         print('show', self.pos)
-        ui_key = mark_point_ui_name + str(self.pos)
-        clientApi.RegisterUI(mod_name, ui_key, mark_point_ui_cls_path, mark_point_ui_def)
         self.ui_node = clientApi.CreateUI(
             mod_name,
-            ui_key,
+            mark_point_ui_name,
             {
                 "isHud": 1,
                 "autoScale": 0,
@@ -27,6 +26,7 @@ class ClientMarkPoint(MarkPoint):
                 "texture": self.texture
             }
         )
+        self.ui_node.session = self.session
 
     def destroy(self):
         if self.ui_node:

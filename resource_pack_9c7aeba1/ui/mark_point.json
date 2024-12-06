@@ -30,6 +30,16 @@
                                  "texture" : "textures/ui/ec_mark/mark_rhombus_bg",
                                  "type" : "image"
                               }
+                           },
+                           {
+                              "distance_label" : {
+                                 "anchor_from" : "bottom_middle",
+                                 "anchor_to" : "top_middle",
+                                 "text" : "0.0m",
+                                 "text_alignment" : "center",
+                                 "type" : "label",
+                                 "visible" : true
+                              }
                            }
                         ],
                         "layer" : 1,
@@ -47,12 +57,10 @@
                   }
                ],
                "layer" : 1,
+               "offset" : [ 0.0, 4.0 ],
                "size" : [ 8.0, "default" ],
                "type" : "stack_panel"
             }
-         },
-         {
-            "tick_refresh_auxiliary@mark_point.tick_refresh_auxiliary": {}
          }
       ],
       "type" : "screen"
@@ -80,22 +88,6 @@
       "from" : [ "100%", "100%" ],
       "next" : "",
       "to" : [ "500%", "500%" ]
-   },
-   "tick_refresh_auxiliary" : {
-      "type" : "label",
-      "layer": 1,
-      "anchor_from": "top_left",
-      "anchor_to": "top_left",
-      "offset": [0, 0],
-      "font_size": "small",
-      "text": "#text",
-      "bindings": [
-         {
-            "binding_name": "#tick_refresh_auxiliary",
-            "binding_condition": "always",
-            "binding_name_override": "#text"
-         }
-      ]
    },
    "namespace" : "mark_point"
 }

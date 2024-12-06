@@ -45,6 +45,7 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
         print('==== ECTeamPulseClient 已加载 ====')
 
     def on_ui_init_finished(self, args):
+        clientApi.RegisterUI(mod_name, mark_point_ui_name, mark_point_ui_cls_path, mark_point_ui_def)
         clientApi.RegisterUI(mod_name, mark_point_ready_ui_name, mark_point_ready_ui_cls_path, mark_point_ready_ui_def)
         clientApi.RegisterUI(mod_name, mark_hud_ui_name, mark_hud_ui_cls_path, mark_hud_ui_def)
         self.NotifyToServer("ClientUiInitFinished", {})

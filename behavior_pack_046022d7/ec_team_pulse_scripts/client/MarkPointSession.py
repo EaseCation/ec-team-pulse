@@ -20,7 +20,8 @@ class MarkPointSession(object):
         self.interaction_mouse_keyboard = InteractionMouseKeyboard(self)
 
     def init_ui(self):
-        clientApi.CreateUI(mod_name, mark_hud_ui_name, {"isHud": 1, })
+        self.hud_ui = clientApi.CreateUI(mod_name, mark_hud_ui_name, {"isHud": 1, })
+        self.hud_ui.session = self
 
     def add_point(self, pos, point_config):
         mark_type = point_config['type']
@@ -34,7 +35,7 @@ class MarkPointSession(object):
                         if mark_point.mark_type == mark_type:
                             self.remove_point(pos0)
 
-        self.mark_points[pos] = ClientMarkPoint(pos, mark_type, point_config['color'], point_config['texture'])
+        self.mark_points[pos] = ClientMarkPoint(self, pos, mark_type, point_config['color'], point_config['texture'])
         self.mark_points[pos].show()
         self.last_point_pos = pos
 
@@ -63,6 +64,11 @@ class MarkPointSession(object):
             mark_point.destroy()
         self.mark_points.clear()
         self.last_point_pos = None
+
+    def on_frame_tick(self):
+        for mark_point in self.mark_points.values():
+            if mark_point.ui_node:
+                mark_point.ui_node.on_frame_tick()
 
     def destroy(self):
         self.clear_all()

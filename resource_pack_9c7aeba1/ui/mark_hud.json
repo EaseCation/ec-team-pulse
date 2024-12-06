@@ -66,10 +66,29 @@
                "size" : [ 10.0, 10.0 ],
                "type" : "button"
             }
+         },
+         {
+            "tick_refresh_auxiliary@mark_hud.tick_refresh_auxiliary": {}
          }
       ],
       "layer" : 1,
       "type" : "panel"
+   },
+   "tick_refresh_auxiliary" : {
+      "type" : "label",
+      "layer": 1,
+      "anchor_from": "top_left",
+      "anchor_to": "top_left",
+      "offset": [0, 0],
+      "font_size": "small",
+      "text": "#text",
+      "bindings": [
+         {
+            "binding_name": "#tick_refresh_auxiliary",
+            "binding_condition": "always",
+            "binding_name_override": "#text"
+         }
+      ]
    },
    "namespace" : "mark_hud"
 }

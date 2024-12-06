@@ -25,6 +25,7 @@ session_config_default = {
         "here": 1,
         "danger": 1
     },
+    "show_distance_pixels": 20,
     "marks": [
         {
             "type": "here",

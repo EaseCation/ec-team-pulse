@@ -10,7 +10,7 @@ path_btn = "/variables_button_mappings_and_controls/safezone_screen_matrix/inner
 class MarkHudScreenNode(ScreenNode):
 	def __init__(self, namespace, name, param):
 		ScreenNode.__init__(self, namespace, name, param)
-
+		self.session = None
 
 	def Create(self):
 		"""
@@ -30,6 +30,11 @@ class MarkHudScreenNode(ScreenNode):
 
 	def on_btn_touch_up(self, args):
 		print("on_btn_touch_up", args)
+
+	@ViewBinder.binding(ViewBinder.BF_BindString, "#tick_refresh_auxiliary")
+	def on_frame_tick(self):
+		if self.session:
+			self.session.on_frame_tick()
 
 	def Destroy(self):
 		"""
