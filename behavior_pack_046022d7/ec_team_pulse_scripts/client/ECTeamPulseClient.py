@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 import mod.client.extraClientApi as clientApi
+
+from ..MarkPoint import MarkPoint
 from ..config import *
 from .MarkPointSession import MarkPointSession
 
@@ -23,6 +25,12 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
         self.ListenForEvent(mod_name, server_system_name,
                             "SetupMarkSession",
                             self, self.on_setup_session)
+        self.ListenForEvent(mod_name, server_system_name,
+                            "MarkPointAdd",
+                            self, self.on_mark_point_add)
+        self.ListenForEvent(mod_name, server_system_name,
+                            "MarkPointRemove",
+                            self, self.on_mark_point_remove)
         self.ListenForEvent(mod_name, server_system_name,
                             "DestroyMarkSession",
                             self, self.on_destroy_session)
@@ -53,8 +61,18 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
     def on_setup_session(self, args):
         if self.mark_point_manager:
             self.mark_point_manager.destroy()
-        self.mark_point_manager = MarkPointSession(self, args)
-        self.mark_point_manager.add_point((0, -60, 0), self.mark_point_manager.config['marks'][0])
+        config = args['config']
+        self.mark_point_manager = MarkPointSession(self, config)
+        self.mark_point_manager.init_points(args['points'])
+        #self.mark_point_manager.client_add_point((0, -60, 0), self.mark_point_manager.config['marks'][0])
+
+    def on_mark_point_add(self, args):
+        if self.mark_point_manager:
+            self.mark_point_manager.add_client_point(MarkPoint.from_dict(args['point']))
+
+    def on_mark_point_remove(self, args):
+        if self.mark_point_manager:
+            self.mark_point_manager.remove_point(args['point_id'])
 
     def on_destroy_session(self, args):
         if self.mark_point_manager:

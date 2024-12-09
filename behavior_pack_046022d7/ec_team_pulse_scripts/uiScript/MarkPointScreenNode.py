@@ -22,8 +22,7 @@ class MarkPointScreenNode(ScreenNode):
 		self.session = None  # type: MarkPointSession | None
 		self.texture = param['texture']
 		self.color = param['color']
-		self.spawn_percent = 0.0
-		self.spawn_time = 0
+		self.destroy_time = 0
 
 	def Create(self):
 		"""
@@ -45,10 +44,12 @@ class MarkPointScreenNode(ScreenNode):
 			padding_control.asImage().SetSpriteColor((float(self.color[0]) / 255, float(self.color[1]) / 255, float(self.color[2]) / 255))
 		else:
 			print("MarkPointScreenNode Create padding_control is None")
-		self.spawn_time = time.time()
 		print('mark spawn', self.color)
 
 	def Update(self):
+		if self.destroy_time and time.time() > self.destroy_time:
+			self.SetRemove()
+			return
 		# 动态显示距离文字
 		if self.session and self.session.config['show_distance_pixels']:
 			dimension, pos = self.GetBindWorldPosition()
@@ -70,6 +71,10 @@ class MarkPointScreenNode(ScreenNode):
 				distance_label.asLabel().SetText(str(round(distance, 2)) + "m")
 			else:
 				distance_label.SetVisible(False)
+
+	def pending_destroy(self):
+		self.destroy_time = time.time() + 0.4
+		self.GetBaseUIControl("/stack_panel").SetAnimation("alpha", "mark_point", "global_alpha_ease_out", True)
 
 	def on_frame_tick(self):
 		pass

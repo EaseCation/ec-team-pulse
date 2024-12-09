@@ -40,7 +40,7 @@
                                  "text" : "0.0m",
                                  "text_alignment" : "center",
                                  "type" : "label",
-                                 "visible" : false
+                                 "visible" : true
                               }
                            }
                         ],
@@ -67,11 +67,20 @@
                "layer" : 1,
                "offset" : [ 0.0, 4.0 ],
                "size" : [ 8.0, 16.0 ],
-               "type" : "panel"
+               "type" : "panel",
+               "propagate_alpha" : true
             }
          }
       ],
       "type" : "screen"
+   },
+   "global_alpha_ease_out": {
+      "anim_type": "alpha",
+      "duration": 0.20,
+      "easing": "out_cubic",
+      "from": 1.0,
+      "next": "",
+      "to": 0.0
    },
    "mark_point_alpha" : {
       "anim_type" : "alpha",

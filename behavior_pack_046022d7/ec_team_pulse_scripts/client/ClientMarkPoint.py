@@ -8,8 +8,8 @@ comp_game = clientApi.GetEngineCompFactory().CreateGame(clientApi.GetLocalPlayer
 
 class ClientMarkPoint(MarkPoint):
 
-    def __init__(self, session, pos, mark_type, color, texture):
-        super(ClientMarkPoint, self).__init__(pos, mark_type, color, texture)
+    def __init__(self, session, point_id, pos, owner, mark_type, color, texture):
+        super(ClientMarkPoint, self).__init__(point_id, pos, owner, mark_type, color, texture)
         self.session = session
         self.ui_node = None  # type: MarkPointScreenNode | None
 
@@ -30,6 +30,14 @@ class ClientMarkPoint(MarkPoint):
 
     def destroy(self):
         if self.ui_node:
-            self.ui_node.SetRemove()
-            # TODO 需要一个动画来移除，而不是瞬间消失
+            self.ui_node.pending_destroy()
             self.ui_node = None
+
+    @staticmethod
+    def from_mark_point(session, mark_point):
+        """
+        从MarkPoint对象创建ClientMarkPoint对象
+        :type session: MarkPointSession
+        :type mark_point: MarkPoint
+        """
+        return ClientMarkPoint(session, mark_point.point_id, mark_point.pos, mark_point.owner, mark_point.mark_type, mark_point.color, mark_point.texture)

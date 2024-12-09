@@ -96,14 +96,14 @@ class InteractionMouseKeyboard(object):
                         mark_config = self.session.config['marks'][1]
                         self.pending_mark = None
                         self.pending_mark_apply_time = 0
-                        self.session.add_point(pos, mark_config)
+                        self.session.request_add_point(pos, mark_config)
                 elif hit.target.typeOfHit == TYPE_ENTITY:
                     comp_pos = clientApi.GetEngineCompFactory().CreatePos(hit.target.entityHit)
                     pos = comp_pos.GetPos()
                     pos = (pos[0], pos[1] + 0.5, pos[2])
                     self.pending_mark = None
                     self.pending_mark_apply_time = 0
-                    self.session.add_point(pos, self.session.config['marks'][1])  # 直接负面效果
+                    self.session.request_add_point(pos, self.session.config['marks'][1])  # 直接负面效果
                 break
             self.last_click_time = time.time()
 
@@ -111,6 +111,6 @@ class InteractionMouseKeyboard(object):
         if 0 < self.pending_mark_apply_time < time.time() and self.pending_mark:
             pos = self.pending_mark[0]
             mark_config = self.pending_mark[1]
-            self.session.add_point(pos, mark_config)
+            self.session.request_add_point(pos, mark_config)
             self.pending_mark = None
             self.pending_mark_apply_time = 0
