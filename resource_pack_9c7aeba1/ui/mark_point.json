@@ -40,7 +40,7 @@
                                  "text" : "0.0m",
                                  "text_alignment" : "center",
                                  "type" : "label",
-                                 "visible" : true
+                                 "visible" : false
                               }
                            }
                         ],
@@ -52,15 +52,15 @@
                   },
                   {
                      "padding" : {
-                        "alpha": "@mark_point.mark_point_padding_alpha",
+                        "alpha" : "@mark_point.mark_point_padding_alpha",
                         "anchor_from" : "center",
                         "anchor_to" : "top_middle",
-                        "size" : "@mark_point.mark_point_padding_size",
-                        "type" : "image",
-                        "offset": "@mark_point.mark_point_padding_offset",
-                        "nineslice_size" : [ 0, 0, 0, 0 ],
                         "is_new_nine_slice" : true,
-                        "texture": "textures/ui/ec_mark/mark_point_stick"
+                        "nineslice_size" : [ 0, 0, 0, 0 ],
+                        "offset" : "@mark_point.mark_point_padding_offset",
+                        "size" : "@mark_point.mark_point_padding_size",
+                        "texture" : "textures/ui/ec_mark/mark_point_stick",
+                        "type" : "image"
                      }
                   }
                ],
@@ -99,23 +99,23 @@
    },
    "mark_point_offset" : {
       "anim_type" : "offset",
-      "duration" : 0.4,
+      "duration" : 0.40,
       "easing" : "out_cubic",
       "from" : [ 0, 0 ],
       "next" : "",
       "to" : [ 0.0, "-100.0%+0.0px" ]
    },
-   "mark_point_padding_alpha": {
+   "mark_point_padding_alpha" : {
       "anim_type" : "alpha",
-      "duration" : 0.4,
+      "duration" : 0.40,
       "easing" : "out_cubic",
       "from" : 0.0,
       "next" : "",
-      "to" : 0.5
+      "to" : 0.50
    },
    "mark_point_padding_offset" : {
       "anim_type" : "offset",
-      "duration" : 0.4,
+      "duration" : 0.40,
       "easing" : "out_cubic",
       "from" : [ 0, 0 ],
       "next" : "",
@@ -123,7 +123,7 @@
    },
    "mark_point_padding_size" : {
       "anim_type" : "size",
-      "duration" : 0.4,
+      "duration" : 0.40,
       "easing" : "out_cubic",
       "from" : [ 2.0, "0.0%+0.0px" ],
       "next" : "",

@@ -6,12 +6,12 @@ ViewBinder = clientApi.GetViewBinderCls()
 ViewRequest = clientApi.GetViewViewRequestCls()
 ScreenNode = clientApi.GetScreenNodeCls()
 
+path_hold = '/hold'
 
 class MarkPointReadyScreenNode(ScreenNode):
 	def __init__(self, namespace, name, param):
 		ScreenNode.__init__(self, namespace, name, param)
-		self.destroy_time = time.time() + 1
-		self.removed = False
+		self.destroy_time = 0
 
 	def Create(self):
 		"""
@@ -37,7 +37,11 @@ class MarkPointReadyScreenNode(ScreenNode):
 		"""
 		pass
 
+	def on_release(self):
+		self.destroy_time = time.time() + 1
+		self.GetBaseUIControl(path_hold).SetVisible(False)
+		self.CreateChildControl("mark_point_ready.check", "check")
+
 	def Update(self):
-		if time.time() > self.destroy_time:
+		if self.destroy_time and time.time() > self.destroy_time:
 			self.SetRemove()
-			self.removed = True

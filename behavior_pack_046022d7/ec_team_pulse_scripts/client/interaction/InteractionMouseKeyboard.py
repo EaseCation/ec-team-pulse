@@ -14,6 +14,7 @@ from ...uiScript.MarkPointReadyScreenNode import MarkPointReadyScreenNode
 comp_game = clientApi.GetEngineCompFactory().CreateGame(clientApi.GetLocalPlayerId())
 
 double_click_time = 0.5
+pending_delay_time = 0.2
 
 class InteractionMouseKeyboard(object):
 
@@ -30,8 +31,10 @@ class InteractionMouseKeyboard(object):
             'OnMouseMiddleDownClientEvent',
             self, self.on_mouse_middle_down)
 
-        self.last_mark_time = 0
         self.point_ready_ui = None  # type: MarkPointReadyScreenNode | None
+        self.last_click_time = 0
+        self.pending_mark = None  # type: tuple[tuple[float, float, float], dict] | None
+        self.pending_mark_apply_time = 0
 
     def destroy(self):
         self.session.client.UnListenForEvent(
@@ -45,18 +48,30 @@ class InteractionMouseKeyboard(object):
             self, self.on_mouse_middle_down
         )
 
-    def create_point_ready_ui(self, pos):
+    def create_point_ready_ui(self):
+        if self.point_ready_ui is not None:
+            self.point_ready_ui.SetRemove()
+            self.point_ready_ui = None
         self.point_ready_ui = clientApi.CreateUI(
             mod_name,
             mark_point_ready_ui_name,
             {
                 "isHud": 1,
                 "autoScale": 0,
-                "bindWorldPosition": (comp_game.GetCurrentDimension(), (pos[0], pos[1], pos[2])),
+                #"bindWorldPosition": (comp_game.GetCurrentDimension(), (pos[0], pos[1], pos[2])),
             }
         )
 
     def on_mouse_middle_down(self, args):
+        now = time.time()
+        is_down = args['isDown'] == 1
+        if is_down:
+            if not self.pending_mark and now - self.last_click_time > double_click_time:
+                self.create_point_ready_ui()
+            return
+        else:
+            if self.point_ready_ui and self.point_ready_ui.destroy_time == 0:
+                self.point_ready_ui.on_release()
         player_id = clientApi.GetLocalPlayerId()
         pos_comp = clientApi.GetEngineCompFactory().CreatePos(player_id)
         rot_comp = clientApi.GetEngineCompFactory().CreateRot(player_id)
@@ -74,29 +89,28 @@ class InteractionMouseKeyboard(object):
             for hit in hits:
                 if hit.target.typeOfHit == TYPE_BLOCK:
                     pos = (hit.target.hitVector.x, hit.target.hitVector.y, hit.target.hitVector.z)
-                    now = time.time()
-                    negative = now - self.last_mark_time < double_click_time
-                    self.try_mark_point(pos, args['isDown'] == 0, negative)
+                    if not self.pending_mark and now - self.last_click_time > double_click_time:  # 之前没点过，这次是第一次点击，所以延迟生效
+                        self.pending_mark = (pos, self.session.config['marks'][0])
+                        self.pending_mark_apply_time = now + pending_delay_time
+                    else:  # 之前点过，而且还未生效，表示是双击，这次是第二次点击，所以立即生效（负面）
+                        mark_config = self.session.config['marks'][1]
+                        self.pending_mark = None
+                        self.pending_mark_apply_time = 0
+                        self.session.add_point(pos, mark_config)
                 elif hit.target.typeOfHit == TYPE_ENTITY:
                     comp_pos = clientApi.GetEngineCompFactory().CreatePos(hit.target.entityHit)
                     pos = comp_pos.GetPos()
                     pos = (pos[0], pos[1] + 0.5, pos[2])
-                    self.try_mark_point(pos, args['isDown'] == 0, True)
+                    self.pending_mark = None
+                    self.pending_mark_apply_time = 0
+                    self.session.add_point(pos, self.session.config['marks'][1])  # 直接负面效果
                 break
-
-    def try_mark_point(self, pos, confirm, negative=False):
-        now = time.time()
-        if now - self.last_mark_time < double_click_time:
-            self.session.remove_last_point()
-        elif confirm:
-            self.create_point_ready_ui(pos)
-        if confirm:
-            self.last_mark_time = now
-            if negative:
-                mark_config = self.session.config['marks'][1]
-            else:
-                mark_config = self.session.config['marks'][0]
-            self.session.add_point(pos, mark_config)
+            self.last_click_time = time.time()
 
     def on_tick(self):
-        pass
+        if 0 < self.pending_mark_apply_time < time.time() and self.pending_mark:
+            pos = self.pending_mark[0]
+            mark_config = self.pending_mark[1]
+            self.session.add_point(pos, mark_config)
+            self.pending_mark = None
+            self.pending_mark_apply_time = 0

@@ -2,40 +2,75 @@
    "main" : {
       "controls" : [
          {
-            "panel" : {
-               "alpha" : "@mark_point_ready.mark_point_ready_alpha_keep",
-               "controls" : [
-                  {
-                     "image" : {
-                        "alpha" : 1,
-                        "clip_direction" : "left",
-                        "clip_ratio" : 0.0,
-                        "layer" : 2,
-                        "size" : [ "100%", "100%" ],
-                        "texture" : "textures/ui/ec_mark/mark_rhombus_bg",
-                        "type" : "image"
-                     }
-                  },
-                  {
-                     "bg" : {
-                        "alpha" : "@mark_point_ready.mark_point_ready_bg_alpha",
-                        "clip_direction" : "left",
-                        "clip_ratio" : 0.0,
-                        "layer" : 1,
-                        "size" : "@mark_point_ready.mark_point_ready_bg_size",
-                        "texture" : "textures/ui/ec_mark/mark_rhombus_bg",
-                        "type" : "image"
-                     }
-                  }
-               ],
-               "layer" : 1,
-               "propagate_alpha" : true,
-               "size" : [ 6.0, 6.0 ],
-               "type" : "panel"
-            }
+            "hold@mark_point_ready.hold": {}
          }
       ],
       "type" : "screen"
+   },
+   "check" : {
+      "alpha" : "@mark_point_ready.mark_point_ready_alpha_keep",
+      "controls" : [
+         {
+            "image" : {
+               "alpha" : 1,
+               "clip_direction" : "left",
+               "clip_ratio" : 0.0,
+               "layer" : 2,
+               "size" : [ "100%", "100%" ],
+               "texture" : "textures/ui/ec_mark/mark_rhombus_bg",
+               "type" : "image"
+            }
+         },
+         {
+            "bg" : {
+               "alpha" : "@mark_point_ready.mark_point_ready_bg_alpha",
+               "clip_direction" : "left",
+               "clip_ratio" : 0.0,
+               "layer" : 1,
+               "size" : "@mark_point_ready.mark_point_ready_bg_size",
+               "texture" : "textures/ui/ec_mark/mark_rhombus_bg",
+               "type" : "image"
+            }
+         }
+      ],
+      "layer" : 1,
+      "propagate_alpha" : true,
+      "size" : [ 6.0, 6.0 ],
+      "type" : "panel"
+   },
+   "hold" : {
+      "controls" : [
+         {
+            "image" : {
+               "alpha" : 1,
+               "clip_direction" : "left",
+               "clip_ratio" : 0.0,
+               "layer" : 2,
+               "size" : [ "100%", "100%" ],
+               "texture" : "textures/ui/ec_mark/mark_rhombus_bg",
+               "type" : "image"
+            }
+         }
+      ],
+      "layer" : 1,
+      "propagate_alpha" : true,
+      "size" : [ 6.0, 6.0 ],
+      "type" : "panel"
+   },
+   "mark_point_ready_alpha_keep" : {
+      "anim_type" : "alpha",
+      "duration" : 0.20,
+      "from" : 0.50,
+      "next" : "@mark_point_ready.mark_point_ready_alpha_out",
+      "to" : 0.50
+   },
+   "mark_point_ready_alpha_out" : {
+      "anim_type" : "alpha",
+      "duration" : 0.40,
+      "easing" : "in_sin",
+      "from" : 0.50,
+      "next" : "",
+      "to" : 0.0
    },
    "mark_point_ready_bg_alpha" : {
       "anim_type" : "alpha",
@@ -52,21 +87,6 @@
       "from" : [ "500%", "500%" ],
       "next" : "",
       "to" : [ "100%", "100%" ]
-   },
-   "mark_point_ready_alpha_keep" : {
-      "anim_type" : "alpha",
-      "duration" : 0.20,
-      "from" : 0.5,
-      "next" : "@mark_point_ready.mark_point_ready_alpha_out",
-      "to" : 0.5
-   },
-   "mark_point_ready_alpha_out" : {
-      "anim_type" : "alpha",
-      "duration" : 0.40,
-      "easing" : "in_sin",
-      "from" : 0.5,
-      "next" : "",
-      "to" : 0.0
    },
    "namespace" : "mark_point_ready"
 }
