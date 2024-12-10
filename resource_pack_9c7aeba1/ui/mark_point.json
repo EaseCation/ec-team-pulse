@@ -110,7 +110,7 @@
       "anim_type" : "offset",
       "duration" : 0.40,
       "easing" : "out_cubic",
-      "from" : [ 0, 0 ],
+      "from" : [ 0, "50%" ],
       "next" : "",
       "to" : [ 0.0, "-100.0%+0.0px" ]
    },
@@ -126,7 +126,7 @@
       "anim_type" : "offset",
       "duration" : 0.40,
       "easing" : "out_cubic",
-      "from" : [ 0, 0 ],
+      "from" : [ 0, "50%" ],
       "next" : "",
       "to" : [ 0.0, "-100.0%+4px" ]
    },
@@ -136,7 +136,7 @@
       "easing" : "out_cubic",
       "from" : [ 2.0, "0.0%+0.0px" ],
       "next" : "",
-      "to" : [ 2.0, "80.0%+0.0px" ]
+      "to" : [ 2.0, "100.0%+0.0px" ]
    },
    "namespace" : "mark_point"
 }

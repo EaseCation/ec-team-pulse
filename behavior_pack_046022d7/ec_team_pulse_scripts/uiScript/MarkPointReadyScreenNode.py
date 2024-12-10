@@ -37,6 +37,11 @@ class MarkPointReadyScreenNode(ScreenNode):
 		"""
 		pass
 
+	def set_color(self, color):
+		hold_img = self.GetBaseUIControl(path_hold + '/image')
+		if hold_img:
+			hold_img.asImage().SetSpriteColor((float(color[0]) / 255, float(color[1]) / 255, float(color[2]) / 255))
+
 	def on_release(self):
 		self.destroy_time = time.time() + 1
 		self.GetBaseUIControl(path_hold).SetVisible(False)

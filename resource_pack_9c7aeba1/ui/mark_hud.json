@@ -31,6 +31,11 @@
                      "binding_collection_name" : "",
                      "binding_condition" : "always_when_visible",
                      "binding_type" : "collection_details"
+                  },
+                  {
+                     "binding_name": "#hotbar_elipses_right_visible",
+                     "binding_name_override": "#visible",
+                     "binding_type": "global"
                   }
                ],
                "button_mappings" : [],

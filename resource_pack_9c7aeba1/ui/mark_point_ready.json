@@ -50,12 +50,50 @@
                "texture" : "textures/ui/ec_mark/mark_rhombus_bg",
                "type" : "image"
             }
+         },
+         {
+            "hold_tip": {
+               "anchor_from" : "top_middle",
+               "anchor_to" : "bottom_middle",
+               "type" : "image",
+               "texture" : "textures/ui/hud_tip_text_background",
+               "size": [ "100%cm + 8px", "100%cm + 4px"],
+               "offset": [0.0, "-8px"],
+               "alpha": "@mark_point_ready.mark_point_ready_tip_alpha",
+               "controls": [
+                  {
+                     "hold_label": {
+                        "anchor_from" : "center",
+                        "anchor_to" : "center",
+                        "type" : "label",
+                        "text" : "松开放置标点",
+                        "text_alignment" : "center",
+                        "visible" : true,
+                        "alpha": "@mark_point_ready.mark_point_ready_tip_label_alpha"
+                     }
+                  }
+               ]
+            }
          }
       ],
       "layer" : 1,
       "propagate_alpha" : true,
       "size" : [ 6.0, 6.0 ],
       "type" : "panel"
+   },
+   "mark_point_ready_tip_alpha" : {
+      "anim_type" : "alpha",
+      "duration" : 0.20,
+      "from" : 0,
+      "next" : "",
+      "to" : 0.3
+   },
+   "mark_point_ready_tip_label_alpha" : {
+      "anim_type" : "alpha",
+      "duration" : 0.20,
+      "from" : 0,
+      "next" : "",
+      "to" : 1.0
    },
    "mark_point_ready_alpha_keep" : {
       "anim_type" : "alpha",

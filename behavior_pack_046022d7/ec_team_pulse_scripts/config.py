@@ -25,6 +25,9 @@ session_config_default = {
         "here": 1,
         "danger": 1
     },
+    "interaction": {
+        "touch_mark_button_offset": [ -80.0, 40.0 ]
+    },
     "show_distance_pixels": 20,
     "marks": [
         {

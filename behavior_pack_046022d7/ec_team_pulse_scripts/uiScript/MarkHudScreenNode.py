@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 import mod.client.extraClientApi as clientApi
+
+try:
+	from ..client.interaction.InteractionTouch import InteractionTouch
+except:
+	pass
+
 ViewBinder = clientApi.GetViewBinderCls()
 ViewRequest = clientApi.GetViewViewRequestCls()
 ScreenNode = clientApi.GetScreenNodeCls()
@@ -10,7 +16,7 @@ path_btn = "/variables_button_mappings_and_controls/safezone_screen_matrix/inner
 class MarkHudScreenNode(ScreenNode):
 	def __init__(self, namespace, name, param):
 		ScreenNode.__init__(self, namespace, name, param)
-		self.session = None
+		self.interaction = param['interaction']  # type: InteractionTouch | None
 
 	def Create(self):
 		"""
@@ -18,6 +24,10 @@ class MarkHudScreenNode(ScreenNode):
 		"""
 		btn_control = self.GetBaseUIControl(path_btn)
 		if btn_control:
+			touch_mark_button_offset = self.interaction.session.config['interaction']['touch_mark_button_offset']
+			if touch_mark_button_offset:
+				btn_control.SetFullPosition('x', {"absoluteValue": touch_mark_button_offset[0]})
+				btn_control.SetFullPosition('y', {"absoluteValue": touch_mark_button_offset[1]})
 			btn_control.asButton().AddTouchEventParams({"isSwallow": 0})
 			btn_control.asButton().SetButtonTouchDownCallback(self.on_btn_touch_down)
 			btn_control.asButton().SetButtonTouchUpCallback(self.on_btn_touch_up)
@@ -26,15 +36,15 @@ class MarkHudScreenNode(ScreenNode):
 			print("MarkHudScreenNode Create btn_control is None")
 
 	def on_btn_touch_down(self, args):
-		print("on_btn_touch_down", args)
+		self.interaction.on_btn_touch_down(args)
 
 	def on_btn_touch_up(self, args):
-		print("on_btn_touch_up", args)
+		self.interaction.on_btn_touch_up(args)
 
 	@ViewBinder.binding(ViewBinder.BF_BindString, "#tick_refresh_auxiliary")
 	def on_frame_tick(self):
-		if self.session:
-			self.session.on_frame_tick()
+		if self.interaction.session:
+			self.interaction.session.on_frame_tick()
 
 	def Destroy(self):
 		"""
