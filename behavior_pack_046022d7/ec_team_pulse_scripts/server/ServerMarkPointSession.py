@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import time
+
 import mod.server.extraServerApi as serverApi
 
 try:
@@ -23,6 +25,11 @@ class ServerMarkPointSession:
 
     def init_listeners(self):
         self.system.ListenForEvent(
+            serverApi.GetEngineNamespace(), serverApi.GetEngineSystemName(),
+            'OnScriptTickServer',
+            self, self.on_tick
+        )
+        self.system.ListenForEvent(
             mod_name,
             client_system_name,
             "ClientMarkPointAdd",
@@ -31,6 +38,11 @@ class ServerMarkPointSession:
         )
 
     def destroy(self):
+        self.system.UnListenForEvent(
+            serverApi.GetEngineNamespace(), serverApi.GetEngineSystemName(),
+            'OnScriptTickServer',
+            self, self.on_tick
+        )
         self.system.UnListenForEvent(
             mod_name,
             client_system_name,
@@ -103,7 +115,7 @@ class ServerMarkPointSession:
         mark_type = mark_config['type']
         point_id = self.next_point_id
         self.next_point_id += 1
-        mark_point = MarkPoint(point_id, pos, owner, mark_type, mark_config['color'], mark_config['texture'])
+        mark_point = MarkPoint(point_id, pos, owner, mark_type, mark_config['color'], mark_config['texture'], time.time() + mark_config['duration'])
         self.mark_points[point_id] = mark_point
         self.players_last_point[owner] = point_id
         self.system.NotifyToMultiClients(
@@ -116,6 +128,11 @@ class ServerMarkPointSession:
 
     def on_player_request_add_point(self, args):
         player = args['__id__']
+        session_id = args['session_id']
+        if session_id != self.session_id:
+            return
+        if player not in self.players:
+            return
         pos = args['pos']
         point_config = args['point_config']
         mark_type = point_config['type']
@@ -129,3 +146,10 @@ class ServerMarkPointSession:
                         if mark_point.mark_type == mark_type:
                             self.remove_point(point_id)
         self.add_point(player, pos, point_config)
+
+    def on_tick(self):
+        now = time.time()
+        for point_id, mark_point in self.mark_points.items():
+            if mark_point.remove_time and now > mark_point.remove_time:
+                self.remove_point(point_id)
+

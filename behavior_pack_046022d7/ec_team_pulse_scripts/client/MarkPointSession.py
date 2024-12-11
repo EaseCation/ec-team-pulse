@@ -8,8 +8,9 @@ from ..MarkPoint import MarkPoint
 
 class MarkPointSession(object):
 
-    def __init__(self, client, config):
+    def __init__(self, client, session_id, config):
         self.client = client  # type: ClientSystem
+        self.session_id = session_id
         self.config = config  # type: dict
         self.mark_points = {}  # type: dict[int, ClientMarkPoint]
         self.interaction_mouse_keyboard = InteractionMouseKeyboard(self)
@@ -23,6 +24,7 @@ class MarkPointSession(object):
         self.client.NotifyToServer(
             "ClientMarkPointAdd",
             {
+                "session_id": self.session_id,
                 "pos": pos,
                 "point_config": point_config
             }
@@ -38,7 +40,7 @@ class MarkPointSession(object):
         从MarkPoint对象添加一个点
         :type point: MarkPoint
         """
-        point = ClientMarkPoint(self, point.point_id, point.pos, point.owner, point.mark_type, point.color, point.texture)
+        point = ClientMarkPoint(self, point.point_id, point.pos, point.owner, point.mark_type, point.color, point.texture, point.remove_time)
         self.mark_points[point.point_id] = point
         point.show()
 

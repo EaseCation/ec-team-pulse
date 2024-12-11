@@ -8,13 +8,12 @@ comp_game = clientApi.GetEngineCompFactory().CreateGame(clientApi.GetLocalPlayer
 
 class ClientMarkPoint(MarkPoint):
 
-    def __init__(self, session, point_id, pos, owner, mark_type, color, texture):
-        super(ClientMarkPoint, self).__init__(point_id, pos, owner, mark_type, color, texture)
+    def __init__(self, session, point_id, pos, owner, mark_type, color, texture, remove_time):
+        super(ClientMarkPoint, self).__init__(point_id, pos, owner, mark_type, color, texture, remove_time)
         self.session = session
         self.ui_node = None  # type: MarkPointScreenNode | None
 
     def show(self):
-        print('show', self.pos, self.color, self.texture)
         self.ui_node = clientApi.CreateUI(
             mod_name,
             mark_point_ui_name,

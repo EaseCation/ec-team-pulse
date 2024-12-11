@@ -35,12 +35,14 @@ session_config_default = {
             "name": "前往这里",
             "color": [255, 210, 48],
             "texture": "textures/ui/ec_mark/mark_rhombus",
+            "duration": 30
         },
         {
             "type": "danger",
             "name": "注意这里",
             "color": [250, 50, 50],
             "texture": "textures/ui/ec_mark/mark_rhombus",
+            "duration": 10
         }
     ]
 }
