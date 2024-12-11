@@ -28,6 +28,8 @@ class InteractionBase(object):
         )
 
         self.holding = False
+        self.holding_mark_type_index = 0  # type: int
+        self.holding_mark_type_auto = True
         self.point_ready_ui = None  # type: MarkPointReadyScreenNode | None
         self.last_click_time = 0
         self.pending_mark = None  # type: tuple[tuple[float, float, float], dict] | None
@@ -72,6 +74,9 @@ class InteractionBase(object):
 
     def on_up(self):
         self.holding = False
+        # 重置holding_select
+        self.holding_mark_type_auto = True
+        self.holding_mark_type_index = 0
         now = time.time()
         if self.point_ready_ui and self.point_ready_ui.destroy_time == 0:
             self.point_ready_ui.on_release()
@@ -80,7 +85,7 @@ class InteractionBase(object):
             if hit.target.typeOfHit == TYPE_BLOCK:
                 pos = (hit.target.hitVector.x, hit.target.hitVector.y, hit.target.hitVector.z)
                 if not self.pending_mark and now - self.last_click_time > double_click_time:  # 之前没点过，这次是第一次点击，所以延迟生效
-                    self.pending_mark = (pos, self.session.config['marks'][0])
+                    self.pending_mark = (pos, self.session.config['marks'][self.holding_mark_type_index])
                     self.pending_mark_apply_time = now + pending_delay_time
                 else:  # 之前点过，而且还未生效，表示是双击，这次是第二次点击，所以立即生效（负面）
                     mark_config = self.session.config['marks'][1]
@@ -93,7 +98,7 @@ class InteractionBase(object):
                 pos = (pos[0], pos[1] + 0.5, pos[2])
                 self.pending_mark = None
                 self.pending_mark_apply_time = 0
-                self.session.request_add_point(pos, self.session.config['marks'][1])  # 直接负面效果
+                self.session.request_add_point(pos, self.session.config['marks'][self.holding_mark_type_index])  # 直接负面效果
             self.last_click_time = time.time()
 
     def ray(self):
@@ -121,17 +126,19 @@ class InteractionBase(object):
             if hit is None:
                 return
             pos = None
-            mark_config = None
             if hit.target.typeOfHit == TYPE_BLOCK:
                 pos = (hit.target.hitVector.x, hit.target.hitVector.y, hit.target.hitVector.z)
-                mark_config = self.session.config['marks'][0]
+                if self.holding_mark_type_auto:
+                    self.holding_mark_type_index = 0
             elif hit.target.typeOfHit == TYPE_ENTITY:
                 comp_pos = clientApi.GetEngineCompFactory().CreatePos(hit.target.entityHit)
                 pos = comp_pos.GetPos()
                 pos = (pos[0], pos[1] + 0.5, pos[2])
-                mark_config = self.session.config['marks'][1]
+                if self.holding_mark_type_auto:
+                    self.holding_mark_type_index = 1
             if pos:
                 self.point_ready_ui.SetBindWorldPosition(comp_game.GetCurrentDimension(), (pos[0], pos[1], pos[2]))
+            mark_config = self.session.config['marks'][self.holding_mark_type_index]
             if mark_config:
                 self.point_ready_ui.set_color(mark_config['color'])
 

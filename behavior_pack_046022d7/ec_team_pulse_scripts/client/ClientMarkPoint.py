@@ -14,7 +14,7 @@ class ClientMarkPoint(MarkPoint):
         self.ui_node = None  # type: MarkPointScreenNode | None
 
     def show(self):
-        print('show', self.pos)
+        print('show', self.pos, self.color, self.texture)
         self.ui_node = clientApi.CreateUI(
             mod_name,
             mark_point_ui_name,
