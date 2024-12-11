@@ -61,7 +61,7 @@ class ServerMarkPointSession:
             }
         )
 
-    def add_player(self, player_id, read_only=True):
+    def add_player(self, player_id, read_only=False):
         self.players.append(player_id)
         self.system.player_to_session[player_id] = self.session_id
         if not read_only:

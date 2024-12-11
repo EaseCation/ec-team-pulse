@@ -42,6 +42,8 @@ class MarkHudScreenNode(ScreenNode):
 		else:
 			print("MarkHudScreenNode Create btn_control is None")
 
+		self.init_select()
+
 	def on_btn_touch_down(self, args):
 		self.interaction.touch.on_btn_touch_down(args)
 
@@ -60,12 +62,6 @@ class MarkHudScreenNode(ScreenNode):
 		for child_path in self.GetAllChildrenPath(path_select_stack):
 			self.RemoveChildControl(self.GetBaseUIControl(child_path))
 		stack = self.GetBaseUIControl(path_select_stack)
-		select = self.GetBaseUIControl(path_select)
-		select.SetVisible(True)
-		select.RemoveAnimation("offset")
-		select.SetAnimation("offset", "mark_hud", "mark_type_select_in_offset", True)
-		select.RemoveAnimation("alpha")
-		select.SetAnimation("alpha", "mark_hud", "mark_type_select_in_alpha", True)
 		marks = self.interaction.session.config['marks']
 		index = 0
 		for mark in marks:
@@ -84,6 +80,9 @@ class MarkHudScreenNode(ScreenNode):
 			label = item_control.GetChildByName("label")  # type: BaseUIControl
 			label.asLabel().SetText(mark['name'])
 			index += 1
+		self.UpdateScreen()
+
+	def show_select(self):
 		# tip
 		tip = self.GetBaseUIControl(path_select_tip)
 		input_mode = comp_view.GetToggleOption(clientApi.GetMinecraftEnum().OptionId.INPUT_MODE)
@@ -91,12 +90,29 @@ class MarkHudScreenNode(ScreenNode):
 			tip.asLabel().SetText("TAB切换标点类型")
 		else:
 			tip.asLabel().SetText("切换标点类型")
-		self.UpdateScreen()
+		# stack
+		select = self.GetBaseUIControl(path_select)
+		select.SetVisible(True)
+		select.RemoveAnimation("offset")
+		select.SetAnimation("offset", "mark_hud", "mark_type_select_in_offset_keep", True)
+		select.RemoveAnimation("alpha")
+		select.SetAnimation("alpha", "mark_hud", "mark_type_select_in_alpha_keep", True)
 
-	def destroy_select(self):
+	def hide_select(self):
 		select = self.GetBaseUIControl(path_select)
 		# select.SetVisible(False)
 		select.RemoveAnimation("offset")
+		clientApi.RegisterUIAnimations({
+			"namespace": "mark_hud",
+			"mark_type_select_out_offset": {
+				"anim_type": "offset",
+				"duration": 0.3,
+				"easing": "in_cubic",
+				"from": select.GetPosition(),
+				"to": (-100, select.GetPosition()[1]),
+				"next": ""
+			},
+		}, True)
 		select.SetAnimation("offset", "mark_hud", "mark_type_select_out_offset", True)
 		select.RemoveAnimation("alpha")
 		select.SetAnimation("alpha", "mark_hud", "mark_type_select_out_alpha", True)

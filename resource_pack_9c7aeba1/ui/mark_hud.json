@@ -26,6 +26,7 @@
                "$texture_layer" : 2,
                "anchor_from" : "top_right",
                "anchor_to" : "top_right",
+               "sound_name": "random.pop",
                "bindings" : [
                   {
                      "binding_collection_name" : "",
@@ -232,6 +233,13 @@
       "text" : "#text",
       "type" : "label"
    },
+   "mark_type_select_in_offset_keep": {
+      "anim_type" : "offset",
+      "duration" : 0.40,
+      "from" : [ -100.0, 40.0 ],
+      "next" : "@mark_hud.mark_type_select_in_offset",
+      "to" : [ -100.0, 40.0 ]
+   },
    "mark_type_select_in_offset" : {
       "anim_type" : "offset",
       "duration" : 0.50,
@@ -240,17 +248,24 @@
       "next" : "",
       "to" : [ 8.0, 40.0 ]
    },
+   "mark_type_select_in_alpha_keep": {
+      "anim_type" : "alpha",
+      "duration" : 0.40,
+      "from" : 0.0,
+      "next" : "@mark_hud.mark_type_select_in_alpha",
+      "to" : 0.0
+   },
    "mark_type_select_in_alpha": {
-        "anim_type": "alpha",
-        "duration": 0.50,
+      "anim_type": "alpha",
+      "duration": 0.50,
       "easing" : "out_cubic",
-        "from": 0.0,
-        "next": "",
-        "to": 0.5
+      "from": 0.0,
+      "next": "",
+      "to": 0.5
    },
    "mark_type_select_out_offset": {
       "anim_type": "offset",
-      "duration": 0.50,
+      "duration": 0.30,
       "easing": "in_cubic",
       "from": [8.0, 40.0],
       "next": "",
@@ -258,7 +273,7 @@
    },
    "mark_type_select_out_alpha": {
       "anim_type": "alpha",
-      "duration": 0.50,
+      "duration": 0.30,
       "easing" : "in_cubic",
       "from": 0.5,
       "next": "",

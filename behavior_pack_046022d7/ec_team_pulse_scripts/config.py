@@ -35,14 +35,31 @@ session_config_default = {
             "name": "前往这里",
             "color": [255, 210, 48],
             "texture": "textures/ui/ec_mark/mark_rhombus",
-            "duration": 30
+            "duration": 30,
+            "sound": {
+                "name": "note.bit",
+                "volume": 1.0,
+                "pitch": 1.5
+            }
         },
         {
             "type": "danger",
             "name": "注意这里",
             "color": [250, 50, 50],
             "texture": "textures/ui/ec_mark/mark_rhombus",
-            "duration": 10
+            "duration": 10,
+            "sound": [
+                {
+                    "name": "note.pling",
+                    "volume": 1.0,
+                    "pitch": 2.0
+                },
+                {
+                    "name": "note.bass",
+                    "volume": 1.0,
+                    "pitch": 1.0
+                },
+            ]
         }
     ]
 }

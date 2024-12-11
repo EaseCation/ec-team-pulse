@@ -93,7 +93,7 @@ class MarkingInteraction(object):
     def on_down(self, force_show_ready_ui=False, show_tip=True):
         self.holding = True
         if self.hud_ui:
-            self.hud_ui.init_select()
+            self.hud_ui.show_select()
         now = time.time()
         if force_show_ready_ui or (not self.pending_mark and now - self.last_click_time > double_click_time):
             hit = self.ray()
@@ -111,7 +111,7 @@ class MarkingInteraction(object):
     def on_up(self):
         self.holding = False
         if self.hud_ui:
-            self.hud_ui.destroy_select()
+            self.hud_ui.hide_select()
         now = time.time()
         if self.point_ready_ui and self.point_ready_ui.destroy_time == 0:
             self.point_ready_ui.on_release()
