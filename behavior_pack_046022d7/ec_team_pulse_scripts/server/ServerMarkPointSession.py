@@ -18,6 +18,7 @@ class ServerMarkPointSession:
         self.system = system  # type: ECTeamPulseServer
         self.config = config
         self.players = []  # type: list[str]
+        self.players_can_operate = []  # type: list[str]
         self.next_point_id = 0
         self.mark_points = {}  # type: dict[int, MarkPoint]
         self.players_last_point = {}  # type: dict[str, int]
@@ -60,21 +61,25 @@ class ServerMarkPointSession:
             }
         )
 
-    def add_player(self, player_id):
+    def add_player(self, player_id, read_only=True):
         self.players.append(player_id)
         self.system.player_to_session[player_id] = self.session_id
+        if not read_only:
+            self.players_can_operate.append(player_id)
         self.system.NotifyToClient(
             player_id,
             "SetupMarkSession",
             {
                 "session_id": self.session_id,
                 "config": session_config_default,
+                "read_only": read_only,
                 "points": [mark_point.to_dict() for mark_point in self.mark_points.values()]
             }
         )
 
     def remove_player(self, player_id):
         self.players.remove(player_id)
+        self.players_can_operate.remove(player_id)
         self.system.player_to_session.pop(player_id)
         self.system.NotifyToClient(
             player_id,
@@ -132,6 +137,8 @@ class ServerMarkPointSession:
         if session_id != self.session_id:
             return
         if player not in self.players:
+            return
+        if player not in self.players_can_operate:
             return
         pos = args['pos']
         point_config = args['point_config']

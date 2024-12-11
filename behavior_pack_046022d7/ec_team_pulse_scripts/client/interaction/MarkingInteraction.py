@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 import time
 
+from mod.client.ui.screenNode import ScreenNode
+
+from .InteractionGamepad import InteractionGamepad
+from .InteractionMouseKeyboard import InteractionMouseKeyboard
+from .InteractionTouch import InteractionTouch
+
 try:
     from ..MarkPointSession import MarkPointSession
 except:
@@ -8,15 +14,16 @@ except:
 import mod.client.extraClientApi as clientApi
 import math
 from ...Raycaster import Vector3, Raycaster, TYPE_BLOCK, TYPE_ENTITY
-from ...config import mod_name, mark_point_ready_ui_name
+from ...config import mod_name, mark_point_ready_ui_name, mark_hud_ui_name
 from ...uiScript.MarkPointReadyScreenNode import MarkPointReadyScreenNode
+from ...uiScript.MarkHudScreenNode import MarkHudScreenNode
 
 comp_game = clientApi.GetEngineCompFactory().CreateGame(clientApi.GetLocalPlayerId())
 
 double_click_time = 0.5
 pending_delay_time = 0.2
 
-class InteractionBase(object):
+class MarkingInteraction(object):
 
     def __init__(self, session):
         self.session = session  # type: MarkPointSession
@@ -27,6 +34,15 @@ class InteractionBase(object):
             self, self.on_tick
         )
 
+        self.hud_ui = clientApi.CreateUI(
+            mod_name,
+            mark_hud_ui_name,
+            {
+                "isHud": 1,
+                "interaction": self
+            }
+        )  # type: ScreenNode | MarkHudScreenNode | None
+
         self.holding = False
         self.holding_mark_type_index = 0  # type: int
         self.holding_mark_type_auto = True
@@ -35,12 +51,27 @@ class InteractionBase(object):
         self.pending_mark = None  # type: tuple[tuple[float, float, float], dict] | None
         self.pending_mark_apply_time = 0
 
+        self.mouse_keyboard = InteractionMouseKeyboard(self)
+        self.touch = InteractionTouch(self)
+        self.gamepad = InteractionGamepad(self)
+
     def destroy(self):
         self.session.client.UnListenForEvent(
             clientApi.GetEngineNamespace(), clientApi.GetEngineSystemName(),
             'OnScriptTickClient',
             self, self.on_tick
         )
+        # 销毁UI
+        if self.hud_ui:
+            self.hud_ui.SetRemove()
+            self.hud_ui = None
+        if self.point_ready_ui:
+            self.point_ready_ui.SetRemove()
+            self.point_ready_ui = None
+        # 摧毁交互
+        self.mouse_keyboard.destroy()
+        self.touch.destroy()
+        self.gamepad.destroy()
 
     def create_point_ready_ui(self, pos, show_tip=True):
         if self.point_ready_ui is not None:
@@ -61,6 +92,8 @@ class InteractionBase(object):
 
     def on_down(self, force_show_ready_ui=False, show_tip=True):
         self.holding = True
+        if self.hud_ui:
+            self.hud_ui.init_select()
         now = time.time()
         if force_show_ready_ui or (not self.pending_mark and now - self.last_click_time > double_click_time):
             hit = self.ray()
@@ -77,6 +110,8 @@ class InteractionBase(object):
 
     def on_up(self):
         self.holding = False
+        if self.hud_ui:
+            self.hud_ui.destroy_select()
         now = time.time()
         if self.point_ready_ui and self.point_ready_ui.destroy_time == 0:
             self.point_ready_ui.on_release()

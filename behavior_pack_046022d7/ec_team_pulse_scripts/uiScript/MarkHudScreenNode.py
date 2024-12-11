@@ -3,9 +3,11 @@ import mod.client.extraClientApi as clientApi
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 
 try:
-	from ..client.interaction.InteractionTouch import InteractionTouch
+	from ..client.interaction.MarkingInteraction import MarkingInteraction
 except:
 	pass
+
+comp_view = clientApi.GetEngineCompFactory().CreatePlayerView(clientApi.GetLevelId())
 
 ViewBinder = clientApi.GetViewBinderCls()
 ViewRequest = clientApi.GetViewViewRequestCls()
@@ -15,11 +17,13 @@ path_btn = "/variables_button_mappings_and_controls/safezone_screen_matrix/inner
 path_select = "/variables_button_mappings_and_controls/safezone_screen_matrix/inner_matrix/safezone_screen_panel/root_screen_panel/mark_type_select"
 path_select_stack = path_select + "/mark_type_select_stack"
 path_select_current = path_select + "/mark_type_select_current"
+path_select_tip = path_select + "/mark_type_select_tip"
+
 
 class MarkHudScreenNode(ScreenNode):
 	def __init__(self, namespace, name, param):
 		ScreenNode.__init__(self, namespace, name, param)
-		self.interaction = param['interaction']  # type: InteractionTouch | None
+		self.interaction = param['interaction']  # type: MarkingInteraction | None
 
 	def Create(self):
 		"""
@@ -39,10 +43,10 @@ class MarkHudScreenNode(ScreenNode):
 			print("MarkHudScreenNode Create btn_control is None")
 
 	def on_btn_touch_down(self, args):
-		self.interaction.on_btn_touch_down(args)
+		self.interaction.touch.on_btn_touch_down(args)
 
 	def on_btn_touch_up(self, args):
-		self.interaction.on_btn_touch_up(args)
+		self.interaction.touch.on_btn_touch_up(args)
 
 	@ViewBinder.binding(ViewBinder.BF_BindString, "#tick_refresh_auxiliary")
 	def on_frame_tick(self):
@@ -58,6 +62,10 @@ class MarkHudScreenNode(ScreenNode):
 		stack = self.GetBaseUIControl(path_select_stack)
 		select = self.GetBaseUIControl(path_select)
 		select.SetVisible(True)
+		select.RemoveAnimation("offset")
+		select.SetAnimation("offset", "mark_hud", "mark_type_select_in_offset", True)
+		select.RemoveAnimation("alpha")
+		select.SetAnimation("alpha", "mark_hud", "mark_type_select_in_alpha", True)
 		marks = self.interaction.session.config['marks']
 		index = 0
 		for mark in marks:
@@ -76,13 +84,22 @@ class MarkHudScreenNode(ScreenNode):
 			label = item_control.GetChildByName("label")  # type: BaseUIControl
 			label.asLabel().SetText(mark['name'])
 			index += 1
+		# tip
+		tip = self.GetBaseUIControl(path_select_tip)
+		input_mode = comp_view.GetToggleOption(clientApi.GetMinecraftEnum().OptionId.INPUT_MODE)
+		if input_mode == clientApi.GetMinecraftEnum().InputMode.Mouse:
+			tip.asLabel().SetText("TAB切换标点类型")
+		else:
+			tip.asLabel().SetText("切换标点类型")
 		self.UpdateScreen()
 
 	def destroy_select(self):
 		select = self.GetBaseUIControl(path_select)
-		select.SetVisible(False)
-		for child_path in self.GetAllChildrenPath(path_select_stack):
-			self.RemoveChildControl(self.GetBaseUIControl(child_path))
+		# select.SetVisible(False)
+		select.RemoveAnimation("offset")
+		select.SetAnimation("offset", "mark_hud", "mark_type_select_out_offset", True)
+		select.RemoveAnimation("alpha")
+		select.SetAnimation("alpha", "mark_hud", "mark_type_select_out_alpha", True)
 
 	def update_select_current(self):
 		control_current = self.GetBaseUIControl(path_select_current)

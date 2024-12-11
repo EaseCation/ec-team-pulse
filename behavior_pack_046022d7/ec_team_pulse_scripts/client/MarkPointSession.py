@@ -1,20 +1,22 @@
 # -*- coding: utf-8 -*-
 from mod.client.system.clientSystem import ClientSystem
 
-from .interaction.InteractionMouseKeyboard import InteractionMouseKeyboard
-from .interaction.InteractionTouch import InteractionTouch
 from .ClientMarkPoint import ClientMarkPoint
+from .interaction.MarkingInteraction import MarkingInteraction
 from ..MarkPoint import MarkPoint
 
 class MarkPointSession(object):
 
-    def __init__(self, client, session_id, config):
+    def __init__(self, client, session_id, config, read_only):
         self.client = client  # type: ClientSystem
         self.session_id = session_id
         self.config = config  # type: dict
+        self.read_only = read_only
         self.mark_points = {}  # type: dict[int, ClientMarkPoint]
-        self.interaction_mouse_keyboard = InteractionMouseKeyboard(self)
-        self.interaction_touch = InteractionTouch(self)
+        if not self.read_only:
+            self.interaction = MarkingInteraction(self)
+        else:
+            self.interaction = None
 
     def init_points(self, points):
         for point in points:
@@ -53,13 +55,10 @@ class MarkPointSession(object):
         for mark_point in self.mark_points.values():
             if mark_point.ui_node:
                 mark_point.ui_node.on_frame_tick()
-        self.interaction_mouse_keyboard.on_frame_tick()
-        self.interaction_touch.on_frame_tick()
+        if self.interaction:
+            self.interaction.on_frame_tick()
 
     def destroy(self):
         self.clear_all()
-        self.interaction_mouse_keyboard.destroy()
-        self.interaction_touch.destroy()
-        if self.hud_ui:
-            self.hud_ui.SetRemove()
-            self.hud_ui = None
+        if self.interaction:
+            self.interaction.destroy()
