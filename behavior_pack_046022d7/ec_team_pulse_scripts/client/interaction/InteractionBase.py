@@ -74,9 +74,6 @@ class InteractionBase(object):
 
     def on_up(self):
         self.holding = False
-        # 重置holding_select
-        self.holding_mark_type_auto = True
-        self.holding_mark_type_index = 0
         now = time.time()
         if self.point_ready_ui and self.point_ready_ui.destroy_time == 0:
             self.point_ready_ui.on_release()
@@ -98,8 +95,12 @@ class InteractionBase(object):
                 pos = (pos[0], pos[1] + 0.5, pos[2])
                 self.pending_mark = None
                 self.pending_mark_apply_time = 0
+                print('mark entity', pos, self.holding_mark_type_index)
                 self.session.request_add_point(pos, self.session.config['marks'][self.holding_mark_type_index])  # 直接负面效果
             self.last_click_time = time.time()
+        # 重置holding_select
+        self.holding_mark_type_auto = True
+        self.holding_mark_type_index = 0
 
     def ray(self):
         player_id = clientApi.GetLocalPlayerId()

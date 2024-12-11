@@ -22,7 +22,11 @@ class InteractionTouch(InteractionBase):
         )
 
     def on_btn_touch_down(self, args):
+        if self.hud_ui:
+            self.hud_ui.init_select()
         self.on_down(True)
 
     def on_btn_touch_up(self, args):
         self.on_up()
+        if self.hud_ui:
+            self.hud_ui.destroy_select()

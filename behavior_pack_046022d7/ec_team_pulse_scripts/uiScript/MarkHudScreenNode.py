@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import mod.client.extraClientApi as clientApi
+from mod.client.ui.controls.baseUIControl import BaseUIControl
 
 try:
 	from ..client.interaction.InteractionTouch import InteractionTouch
@@ -11,23 +12,14 @@ ViewRequest = clientApi.GetViewViewRequestCls()
 ScreenNode = clientApi.GetScreenNodeCls()
 
 path_btn = "/variables_button_mappings_and_controls/safezone_screen_matrix/inner_matrix/safezone_screen_panel/root_screen_panel/btn_mark"
-
+path_select = "/variables_button_mappings_and_controls/safezone_screen_matrix/inner_matrix/safezone_screen_panel/root_screen_panel/mark_type_select"
+path_select_stack = path_select + "/mark_type_select_stack"
+path_select_current = path_select + "/mark_type_select_current"
 
 class MarkHudScreenNode(ScreenNode):
 	def __init__(self, namespace, name, param):
 		ScreenNode.__init__(self, namespace, name, param)
 		self.interaction = param['interaction']  # type: InteractionTouch | None
-
-		self.process_binding = self.override_process_binding
-
-	def override_process_binding(self, screen_name):
-		print('MarkHudScreenNode.process_binding')
-		for key in dir(self):
-			func = getattr(self, key)
-			if hasattr(func, 'collection_name'):
-				self._process_collection(func, screen_name)
-			elif hasattr(func, 'binding_flags'):
-				self._process_default(func, screen_name)
 
 	def Create(self):
 		"""
@@ -54,35 +46,76 @@ class MarkHudScreenNode(ScreenNode):
 
 	@ViewBinder.binding(ViewBinder.BF_BindString, "#tick_refresh_auxiliary")
 	def on_frame_tick(self):
+		self.update_select_current()
 		if self.interaction.session:
 			self.interaction.session.on_frame_tick()
 
 	# region TOGGLE
 
-	@ViewBinder.binding(ViewBinder.BF_BindInt, "#mark_type_select_stack.item_count")
-	def on_toggle_grid_resize(self):
-		return len(self.interaction.session.config['marks'])
+	def init_select(self):
+		for child_path in self.GetAllChildrenPath(path_select_stack):
+			self.RemoveChildControl(self.GetBaseUIControl(child_path))
+		stack = self.GetBaseUIControl(path_select_stack)
+		select = self.GetBaseUIControl(path_select)
+		select.SetVisible(True)
+		marks = self.interaction.session.config['marks']
+		index = 0
+		for mark in marks:
+			child_name = "mark_type_select_toggle_item_" + str(index)
+			item_control = self.CreateChildControl(
+				"mark_hud.mark_type_select_toggle_item",
+				child_name,
+				stack,
+				False
+			)  # type: BaseUIControl
+			item_control.asButton().AddTouchEventParams({"isSwallow": False})
+			item_control.asButton().SetButtonTouchUpCallback(self.on_toggle_changed)
+			icon = item_control.GetChildByName("icon")  # type: BaseUIControl
+			icon.asImage().SetSprite(mark['texture'])
+			icon.asImage().SetSpriteColor((mark['color'][0] / 255.0, mark['color'][1] / 255.0, mark['color'][2] / 255.0))
+			label = item_control.GetChildByName("label")  # type: BaseUIControl
+			label.asLabel().SetText(mark['name'])
+			index += 1
+		self.UpdateScreen()
 
-	@ViewBinder.binding_collection(ViewBinder.BF_BindString, "mark_type_select_stack", "#label_name.text")
-	def on_refresh_item_label(self, index):
-		return self.interaction.session.config['marks'][index]['name']
+	def destroy_select(self):
+		select = self.GetBaseUIControl(path_select)
+		select.SetVisible(False)
+		for child_path in self.GetAllChildrenPath(path_select_stack):
+			self.RemoveChildControl(self.GetBaseUIControl(child_path))
 
-	@ViewBinder.binding_collection(ViewBinder.BF_BindString, "mark_type_select_stack", "#texture")
-	def on_refresh_item_icon(self, index):
-		texture = self.interaction.session.config['marks'][index]['texture']
-		return texture
+	def update_select_current(self):
+		control_current = self.GetBaseUIControl(path_select_current)
+		if self.interaction.holding:
+			control_stack = self.GetBaseUIControl(path_select_stack)
+			stack_pos = control_stack.GetPosition()
+			control_current.SetVisible(True)
+			index = self.interaction.holding_mark_type_index
+			if index < len(self.interaction.session.config['marks']):
+				child_path = path_select_stack + "/mark_type_select_toggle_item_" + str(index)
+				child_control = self.GetBaseUIControl(child_path)
+				if child_control:
+					pos = child_control.GetPosition()
+					new_pos = (pos[0] + stack_pos[0], pos[1] + stack_pos[1])
+					if new_pos != control_current.GetPosition():
+						control_current.RemoveAnimation("offset")
+						clientApi.RegisterUIAnimations({
+							"namespace": "mark_hud",
+							"mark_type_select_current_move": {
+								"anim_type": "offset",
+								"duration": 0.05,
+								"from": control_current.GetPosition(),
+								"to": new_pos,
+								"next": ""
+							}
+						}, True)
+						#control_current.SetPosition(new_pos)
+						control_current.SetAnimation("offset", "mark_hud", "mark_type_select_current_move", True)
+		else:
+			control_current.SetVisible(False)
 
-	@ViewBinder.binding_collection(ViewBinder.BF_BindColor, "mark_type_select_stack", "#color")
-	def on_refresh_item_icon(self, index):
-		color = self.interaction.session.config['marks'][index]['color']
-		return color[0] / 255.0, color[1] / 255.0, color[2] / 255.0
-
-	@ViewBinder.binding_collection(ViewBinder.BF_BindBool, "mark_type_select_stack", "#selected")
-	def on_refresh_toggle_selected(self, index):
-		return self.interaction.holding_mark_type_index == index
-
-	@ViewBinder.binding(ViewBinder.BF_ToggleChanged, "#mark_type_toggle")
 	def on_toggle_changed(self, args):
+		print(str(args))
 		index = args['index']
 		if index >= len(self.interaction.session.config['marks']):
 			index = 0
