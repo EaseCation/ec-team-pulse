@@ -24,7 +24,7 @@ class InteractionTouch(InteractionBase):
     def on_btn_touch_down(self, args):
         if self.hud_ui:
             self.hud_ui.init_select()
-        self.on_down(True)
+        self.on_down(force_show_ready_ui=True)
 
     def on_btn_touch_up(self, args):
         self.on_up()

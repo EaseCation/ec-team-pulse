@@ -23,9 +23,8 @@ class InteractionMouseKeyboard(InteractionBase):
         )
 
     def on_mouse_middle_down(self, args):
-        now = time.time()
         is_down = args['isDown'] == 1
         if is_down:
-            self.on_down()
+            self.on_down(show_tip=False)
         else:
             self.on_up()

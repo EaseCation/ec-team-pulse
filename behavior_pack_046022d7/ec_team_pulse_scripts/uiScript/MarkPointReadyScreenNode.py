@@ -12,22 +12,13 @@ class MarkPointReadyScreenNode(ScreenNode):
 	def __init__(self, namespace, name, param):
 		ScreenNode.__init__(self, namespace, name, param)
 		self.destroy_time = 0
-		self.process_binding = self.override_process_binding
-
-	def override_process_binding(self, screen_name):
-		print('MarkPointReadyScreenNode.process_binding')
-		for key in dir(self):
-			func = getattr(self, key)
-			if hasattr(func, 'collection_name'):
-				self._process_collection(func, screen_name)
-			elif hasattr(func, 'binding_flags'):
-				self._process_default(func, screen_name)
+		self.show_tip = param['showTip']  # type: bool
 
 	def Create(self):
 		"""
 		@description UI创建成功时调用
 		"""
-		pass
+		self.GetBaseUIControl("/hold/hold_tip").SetVisible(self.show_tip)
 
 	def Destroy(self):
 		"""

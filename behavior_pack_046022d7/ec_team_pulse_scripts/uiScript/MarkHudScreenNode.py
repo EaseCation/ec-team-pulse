@@ -115,8 +115,8 @@ class MarkHudScreenNode(ScreenNode):
 			control_current.SetVisible(False)
 
 	def on_toggle_changed(self, args):
-		print(str(args))
-		index = args['index']
+		button_path = args['ButtonPath']
+		index = int(button_path.split('_')[-1])
 		if index >= len(self.interaction.session.config['marks']):
 			index = 0
 		self.interaction.holding_mark_type_auto = False

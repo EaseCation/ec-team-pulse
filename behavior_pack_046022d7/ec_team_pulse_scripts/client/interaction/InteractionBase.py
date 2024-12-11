@@ -42,35 +42,38 @@ class InteractionBase(object):
             self, self.on_tick
         )
 
-    def create_point_ready_ui(self, pos):
+    def create_point_ready_ui(self, pos, show_tip=True):
         if self.point_ready_ui is not None:
             self.point_ready_ui.SetRemove()
             self.point_ready_ui = None
+        args = {
+            "isHud": 1,
+            "autoScale": 0,
+            "showTip": show_tip
+        }
+        if pos is not None:
+            args['bindWorldPosition'] = (comp_game.GetCurrentDimension(), (pos[0], pos[1], pos[2]))
         self.point_ready_ui = clientApi.CreateUI(
             mod_name,
             mark_point_ready_ui_name,
-            {
-                "isHud": 1,
-                "autoScale": 0,
-                "bindWorldPosition": (comp_game.GetCurrentDimension(), (pos[0], pos[1], pos[2]))
-            }
+            args
         )
 
-    def on_down(self, force_show_ready_ui=False):
+    def on_down(self, force_show_ready_ui=False, show_tip=True):
         self.holding = True
         now = time.time()
         if force_show_ready_ui or (not self.pending_mark and now - self.last_click_time > double_click_time):
             hit = self.ray()
+            pos = None
             if hit:
-                pos = None
                 if hit.target.typeOfHit == TYPE_BLOCK:
                     pos = (hit.target.hitVector.x, hit.target.hitVector.y, hit.target.hitVector.z)
                 elif hit.target.typeOfHit == TYPE_ENTITY:
                     comp_pos = clientApi.GetEngineCompFactory().CreatePos(hit.target.entityHit)
                     pos = comp_pos.GetPos()
                     pos = (pos[0], pos[1] + 0.5, pos[2])
-                if pos:
-                    self.create_point_ready_ui(pos)
+
+            self.create_point_ready_ui(pos, show_tip)
 
     def on_up(self):
         self.holding = False
@@ -92,7 +95,9 @@ class InteractionBase(object):
             elif hit.target.typeOfHit == TYPE_ENTITY:
                 comp_pos = clientApi.GetEngineCompFactory().CreatePos(hit.target.entityHit)
                 pos = comp_pos.GetPos()
-                pos = (pos[0], pos[1] + 0.5, pos[2])
+                comp_size = clientApi.GetEngineCompFactory().CreateCollisionBox(hit.target.entityHit)
+                width, height = comp_size.GetSize()
+                pos = (pos[0], pos[1] + height / 2, pos[2])
                 self.pending_mark = None
                 self.pending_mark_apply_time = 0
                 print('mark entity', pos, self.holding_mark_type_index)
@@ -134,7 +139,9 @@ class InteractionBase(object):
             elif hit.target.typeOfHit == TYPE_ENTITY:
                 comp_pos = clientApi.GetEngineCompFactory().CreatePos(hit.target.entityHit)
                 pos = comp_pos.GetPos()
-                pos = (pos[0], pos[1] + 0.5, pos[2])
+                comp_size = clientApi.GetEngineCompFactory().CreateCollisionBox(hit.target.entityHit)
+                width, height = comp_size.GetSize()
+                pos = (pos[0], pos[1] + height / 2, pos[2])
                 if self.holding_mark_type_auto:
                     self.holding_mark_type_index = 1
             if pos:
