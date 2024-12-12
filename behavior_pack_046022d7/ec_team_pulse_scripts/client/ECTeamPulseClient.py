@@ -32,6 +32,9 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
                             "MarkPointRemove",
                             self, self.on_mark_point_remove)
         self.ListenForEvent(mod_name, server_system_name,
+                            "UpdateMarkSessionConfig",
+                            self, self.on_update_session_config)
+        self.ListenForEvent(mod_name, server_system_name,
                             "DestroyMarkSession",
                             self, self.on_destroy_session)
 
@@ -43,6 +46,21 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
         self.UnListenForEvent(clientApi.GetEngineNamespace(), clientApi.GetEngineSystemName(),
                                 "UiInitFinished",
                                 self, self.on_ui_init_finished)
+        self.UnListenForEvent(mod_name, server_system_name,
+                                "SetupMarkSession",
+                                self, self.on_setup_session)
+        self.UnListenForEvent(mod_name, server_system_name,
+                                "MarkPointAdd",
+                                self, self.on_mark_point_add)
+        self.UnListenForEvent(mod_name, server_system_name,
+                                "MarkPointRemove",
+                                self, self.on_mark_point_remove)
+        self.UnListenForEvent(mod_name, server_system_name,
+                                "UpdateMarkSessionConfig",
+                                self, self.on_update_session_config)
+        self.UnListenForEvent(mod_name, server_system_name,
+                                "DestroyMarkSession",
+                                self, self.on_destroy_session)
 
     # 在Destroy中调用反注册取消监听
     def Destroy(self):
@@ -73,8 +91,12 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
             self.mark_point_manager.add_client_point(MarkPoint.from_dict(args['point']))
 
     def on_mark_point_remove(self, args):
-        if self.mark_point_manager:
+        if self.mark_point_manager and args['session_id'] == self.mark_point_manager.session_id:
             self.mark_point_manager.remove_point(args['point_id'])
+
+    def on_update_session_config(self, args):
+        if self.mark_point_manager and args['session_id'] == self.mark_point_manager.session_id:
+            self.mark_point_manager.config = args['config']
 
     def on_destroy_session(self, args):
         if self.mark_point_manager:

@@ -41,6 +41,11 @@ class ECTeamPulseServer(serverApi.GetServerSystemCls()):
         self.sessions[session_id] = session
         return session
 
+    def remove_session(self, session_id):
+        session = self.sessions.pop(session_id)
+        if session:
+            session.destroy()
+
     def on_load_server_addon(self, data):
         print('===== ECTeamPulseServer 已加载 =====')
         self.test()

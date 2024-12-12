@@ -107,6 +107,7 @@ class ServerMarkPointSession:
             self.players,
             "MarkPointRemove",
             {
+                "session_id": self.session_id,
                 "point_id": point_id
             }
         )
@@ -160,3 +161,13 @@ class ServerMarkPointSession:
             if mark_point.remove_time and now > mark_point.remove_time:
                 self.remove_point(point_id)
 
+    def update_config(self, config):
+        self.config = config
+        self.system.NotifyToMultiClients(
+            self.players,
+            "UpdateMarkSessionConfig",
+            {
+                "session_id": self.session_id,
+                "config": self.config
+            }
+        )
