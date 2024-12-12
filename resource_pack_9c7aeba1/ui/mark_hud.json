@@ -74,7 +74,7 @@
             }
          },
          {
-            "tick_refresh_auxiliary@mark_hud.tick_refresh_auxiliary" : {
+            "marking_tick_refresh_auxiliary@mark_hud.marking_tick_refresh_auxiliary" : {
                "layer" : 12
             }
          },
@@ -217,13 +217,13 @@
       "size" : [ 80.0, 24.0 ]
    },
    "namespace" : "mark_hud",
-   "tick_refresh_auxiliary" : {
+   "marking_tick_refresh_auxiliary" : {
       "anchor_from" : "top_left",
       "anchor_to" : "top_left",
       "bindings" : [
          {
             "binding_condition" : "always",
-            "binding_name" : "#tick_refresh_auxiliary",
+            "binding_name" : "#marking_tick_refresh_auxiliary",
             "binding_name_override" : "#text"
          }
       ],

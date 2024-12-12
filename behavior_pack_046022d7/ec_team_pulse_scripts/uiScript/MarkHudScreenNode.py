@@ -49,7 +49,10 @@ class MarkHudScreenNode(ScreenNode):
 	def on_btn_touch_up(self, args):
 		self.interaction.touch.on_btn_touch_up(args)
 
-	@ViewBinder.binding(ViewBinder.BF_BindString, "#tick_refresh_auxiliary")
+	def Update(self):
+		pass
+
+	@ViewBinder.binding(ViewBinder.BF_BindString, "#marking_tick_refresh_auxiliary")
 	def on_frame_tick(self):
 		self.update_select_current()
 		if self.interaction.session:
