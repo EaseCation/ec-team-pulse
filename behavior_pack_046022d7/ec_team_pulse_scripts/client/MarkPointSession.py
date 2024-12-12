@@ -22,6 +22,11 @@ class MarkPointSession(object):
         for point in points:
             self.add_client_point(MarkPoint.from_dict(point), False)
 
+    def on_client_ui_init_finished(self):
+        if self.interaction:
+            self.interaction.destroy()
+            self.interaction = MarkingInteraction(self)
+
     def request_add_point(self, pos, point_config):
         self.client.NotifyToServer(
             "ClientMarkPointAdd",

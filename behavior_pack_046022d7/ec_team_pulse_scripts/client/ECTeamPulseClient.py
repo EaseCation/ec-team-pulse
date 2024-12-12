@@ -12,7 +12,7 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
         super(ECTeamPulseClient, self).__init__(namespace, name)
         self.listen_event()
         self.level_id = clientApi.GetLevelId()
-        self.mark_point_manager = None  # type: MarkPointSession | None
+        self.mark_point_session = None  # type: MarkPointSession | None
 
     # 在类初始化的时候开始监听
     def listen_event(self):
@@ -75,30 +75,32 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
         clientApi.RegisterUI(mod_name, mark_point_ready_ui_name, mark_point_ready_ui_cls_path, mark_point_ready_ui_def)
         clientApi.RegisterUI(mod_name, mark_hud_ui_name, mark_hud_ui_cls_path, mark_hud_ui_def)
         self.NotifyToServer("ClientUiInitFinished", {})
+        if self.mark_point_session:
+            self.mark_point_session.on_client_ui_init_finished()
 
     def on_setup_session(self, args):
-        if self.mark_point_manager:
-            self.mark_point_manager.destroy()
+        if self.mark_point_session:
+            self.mark_point_session.destroy()
         session_id = args['session_id']
         config = args['config']
         read_only = args['read_only']
-        self.mark_point_manager = MarkPointSession(self, session_id, config, read_only)
-        self.mark_point_manager.init_points(args['points'])
+        self.mark_point_session = MarkPointSession(self, session_id, config, read_only)
+        self.mark_point_session.init_points(args['points'])
         #self.mark_point_manager.client_add_point((0, -60, 0), self.mark_point_manager.config['marks'][0])
 
     def on_mark_point_add(self, args):
-        if self.mark_point_manager:
-            self.mark_point_manager.add_client_point(MarkPoint.from_dict(args['point']))
+        if self.mark_point_session:
+            self.mark_point_session.add_client_point(MarkPoint.from_dict(args['point']))
 
     def on_mark_point_remove(self, args):
-        if self.mark_point_manager and args['session_id'] == self.mark_point_manager.session_id:
-            self.mark_point_manager.remove_point(args['point_id'])
+        if self.mark_point_session and args['session_id'] == self.mark_point_session.session_id:
+            self.mark_point_session.remove_point(args['point_id'])
 
     def on_update_session_config(self, args):
-        if self.mark_point_manager and args['session_id'] == self.mark_point_manager.session_id:
-            self.mark_point_manager.config = args['config']
+        if self.mark_point_session and args['session_id'] == self.mark_point_session.session_id:
+            self.mark_point_session.config = args['config']
 
     def on_destroy_session(self, args):
-        if self.mark_point_manager:
-            self.mark_point_manager.destroy()
-            self.mark_point_manager = None
+        if self.mark_point_session:
+            self.mark_point_session.destroy()
+            self.mark_point_session = None

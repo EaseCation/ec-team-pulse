@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import mod.client.extraClientApi as clientApi
-from mod.client.ui.controls.baseUIControl import BaseUIControl
 
 try:
 	from ..client.interaction.MarkingInteraction import MarkingInteraction
@@ -71,13 +70,13 @@ class MarkHudScreenNode(ScreenNode):
 				child_name,
 				stack,
 				False
-			)  # type: BaseUIControl
+			)
 			item_control.asButton().AddTouchEventParams({"isSwallow": False})
 			item_control.asButton().SetButtonTouchUpCallback(self.on_toggle_changed)
-			icon = item_control.GetChildByName("icon")  # type: BaseUIControl
+			icon = item_control.GetChildByName("icon")
 			icon.asImage().SetSprite(mark['texture'])
 			icon.asImage().SetSpriteColor((mark['color'][0] / 255.0, mark['color'][1] / 255.0, mark['color'][2] / 255.0))
-			label = item_control.GetChildByName("label")  # type: BaseUIControl
+			label = item_control.GetChildByName("label")
 			label.asLabel().SetText(mark['name'])
 			index += 1
 		self.UpdateScreen()
