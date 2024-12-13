@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from mod.common.minecraftEnum import KeyBoardType, GamepadKeyType
+
 mod_name = 'ECTeamPulse'
 
 server_system_name = 'ECTeamPulseServer'
@@ -25,10 +27,9 @@ session_config_default = {
         "here": 1,
         "danger": 1
     },
-    "interaction": {
-        "touch_mark_button_offset": [ -80.0, 40.0 ]
-    },
     "show_distance_pixels": 20,
+    "mark_index_single_click": 0,
+    "mark_index_double_click": 1,
     "marks": [
         {
             "type": "here",
@@ -62,4 +63,10 @@ session_config_default = {
             ]
         }
     ]
+}
+
+interaction_config_default = {
+    "touch_mark_button_offset": [ -80.0, 40.0 ],
+    "keyboard_switch": KeyBoardType.KEY_TAB,
+    "gamepad_hold": [GamepadKeyType.KEY_RS]  # 支持同时按下多个按键来触发
 }

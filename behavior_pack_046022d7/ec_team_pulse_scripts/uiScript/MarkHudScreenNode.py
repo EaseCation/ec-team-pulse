@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import mod.client.extraClientApi as clientApi
+from mod.common.minecraftEnum import KeyBoardType
 
 try:
 	from ..client.interaction.MarkingInteraction import MarkingInteraction
@@ -18,6 +19,9 @@ path_select_stack = path_select + "/mark_type_select_stack"
 path_select_current = path_select + "/mark_type_select_current"
 path_select_tip = path_select + "/mark_type_select_tip"
 
+# 键盘Key枚举到名称映射
+key_name_map = {value: name[4:] if name.startswith('KEY_') else name for name, value in KeyBoardType.__dict__.items() if not name.startswith('__')}
+
 
 class MarkHudScreenNode(ScreenNode):
 	def __init__(self, namespace, name, param):
@@ -30,7 +34,7 @@ class MarkHudScreenNode(ScreenNode):
 		"""
 		btn_control = self.GetBaseUIControl(path_btn)
 		if btn_control:
-			touch_mark_button_offset = self.interaction.session.config['interaction']['touch_mark_button_offset']
+			touch_mark_button_offset = self.interaction.session.interaction_config['touch_mark_button_offset']
 			if touch_mark_button_offset:
 				btn_control.SetFullPosition('x', {"absoluteValue": touch_mark_button_offset[0]})
 				btn_control.SetFullPosition('y', {"absoluteValue": touch_mark_button_offset[1]})
@@ -89,7 +93,8 @@ class MarkHudScreenNode(ScreenNode):
 		tip = self.GetBaseUIControl(path_select_tip)
 		input_mode = comp_view.GetToggleOption(clientApi.GetMinecraftEnum().OptionId.INPUT_MODE)
 		if input_mode == clientApi.GetMinecraftEnum().InputMode.Mouse:
-			tip.asLabel().SetText("TAB切换标点类型")
+			key_name = key_name_map.get(self.interaction.session.interaction_config['keyboard_switch'], "")
+			tip.asLabel().SetText(str(key_name) + "切换标点类型")
 		else:
 			tip.asLabel().SetText("切换标点类型")
 		# stack

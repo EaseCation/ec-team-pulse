@@ -7,10 +7,11 @@ from ..MarkPoint import MarkPoint
 
 class MarkPointSession(object):
 
-    def __init__(self, client, session_id, config, read_only):
+    def __init__(self, client, session_id, config, interaction_config, read_only):
         self.client = client  # type: ClientSystem
         self.session_id = session_id
         self.config = config  # type: dict
+        self.interaction_config = interaction_config  # type: dict
         self.read_only = read_only
         self.mark_points = {}  # type: dict[int, ClientMarkPoint]
         if not self.read_only:
@@ -45,6 +46,7 @@ class MarkPointSession(object):
     def add_client_point(self, point, play_sound=True):
         """
         从MarkPoint对象添加一个点
+        :param play_sound: 是否播放音效
         :type point: MarkPoint
         """
         point_config = None

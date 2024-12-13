@@ -83,8 +83,9 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
             self.mark_point_session.destroy()
         session_id = args['session_id']
         config = args['config']
+        interaction_config = args['interaction_config']
         read_only = args['read_only']
-        self.mark_point_session = MarkPointSession(self, session_id, config, read_only)
+        self.mark_point_session = MarkPointSession(self, session_id, config, interaction_config, read_only)
         self.mark_point_session.init_points(args['points'])
         #self.mark_point_manager.client_add_point((0, -60, 0), self.mark_point_manager.config['marks'][0])
 

@@ -39,7 +39,7 @@ class InteractionMouseKeyboard:
     def on_key_press_in_game(self, args):
         if not self.interaction.holding:
             return
-        if args['key'] != str(KeyBoardType.KEY_TAB) or args['screenName'] != 'hud_screen':
+        if args['key'] != str(self.interaction.session.interaction_config['keyboard_switch']) or args['screenName'] != 'hud_screen':
             return
         if args['isDown'] == '0':
             self.interaction.holding_mark_type_auto = False

@@ -44,7 +44,7 @@ class MarkingInteraction(object):
         )  # type: ScreenNode | MarkHudScreenNode | None
 
         self.holding = False
-        self.holding_mark_type_index = 0  # type: int
+        self.holding_mark_type_index = self.session.config['mark_index_single_click']  # type: int
         self.holding_mark_type_auto = True
         self.point_ready_ui = None  # type: MarkPointReadyScreenNode | None
         self.last_click_time = 0
@@ -123,7 +123,7 @@ class MarkingInteraction(object):
                     self.pending_mark = (pos, self.session.config['marks'][self.holding_mark_type_index])
                     self.pending_mark_apply_time = now + pending_delay_time
                 else:  # 之前点过，而且还未生效，表示是双击，这次是第二次点击，所以立即生效（负面）
-                    mark_config = self.session.config['marks'][1]
+                    mark_config = self.session.config['marks'][self.session.config['mark_index_double_click']]
                     self.pending_mark = None
                     self.pending_mark_apply_time = 0
                     self.session.request_add_point(pos, mark_config)
@@ -140,7 +140,7 @@ class MarkingInteraction(object):
             self.last_click_time = time.time()
         # 重置holding_select
         self.holding_mark_type_auto = True
-        self.holding_mark_type_index = 0
+        self.holding_mark_type_index = self.session.config['mark_index_single_click']
 
     def ray(self):
         player_id = clientApi.GetLocalPlayerId()
@@ -170,7 +170,7 @@ class MarkingInteraction(object):
             if hit.target.typeOfHit == TYPE_BLOCK:
                 pos = (hit.target.hitVector.x, hit.target.hitVector.y, hit.target.hitVector.z)
                 if self.holding_mark_type_auto:
-                    self.holding_mark_type_index = 0
+                    self.holding_mark_type_index = self.session.config['mark_index_single_click']
             elif hit.target.typeOfHit == TYPE_ENTITY:
                 comp_pos = clientApi.GetEngineCompFactory().CreatePos(hit.target.entityHit)
                 pos = comp_pos.GetPos()
@@ -178,7 +178,7 @@ class MarkingInteraction(object):
                 width, height = comp_size.GetSize()
                 pos = (pos[0], pos[1] + height / 2, pos[2])
                 if self.holding_mark_type_auto:
-                    self.holding_mark_type_index = 1
+                    self.holding_mark_type_index = self.session.config['mark_index_double_click']
             if pos:
                 self.point_ready_ui.SetBindWorldPosition(comp_game.GetCurrentDimension(), (pos[0], pos[1], pos[2]))
             mark_config = self.session.config['marks'][self.holding_mark_type_index]

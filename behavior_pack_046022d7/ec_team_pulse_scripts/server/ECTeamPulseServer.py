@@ -34,10 +34,10 @@ class ECTeamPulseServer(serverApi.GetServerSystemCls()):
         self.un_listen_event()
         print('==== 服务端完成反注册 ====')
 
-    def create_session(self, config):
+    def create_session(self, config, default_interaction_config):
         session_id = self.next_session_id
         self.next_session_id += 1
-        session = ServerMarkPointSession(session_id, self, config)
+        session = ServerMarkPointSession(session_id, self, config, default_interaction_config)
         self.sessions[session_id] = session
         return session
 
@@ -51,7 +51,7 @@ class ECTeamPulseServer(serverApi.GetServerSystemCls()):
         self.test()
 
     def test(self):
-        self.create_session(session_config_default)
+        self.create_session(session_config_default, interaction_config_default)
 
     def on_client_ui_init_finished(self, args):
         print('on_client_ui_init_finished', args)

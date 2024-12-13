@@ -3,6 +3,8 @@ import time
 
 import mod.server.extraServerApi as serverApi
 
+from .sessionConfigCheck import check_session_config, check_interaction_config
+
 try:
     from .ECTeamPulseServer import ECTeamPulseServer
 except:
@@ -13,10 +15,23 @@ from ..config import *
 
 class ServerMarkPointSession:
 
-    def __init__(self, session_id, system, config):
+    def __init__(self, session_id, system, config, default_interaction_config):
+        """
+        :type session_id: int
+        :type system: ECTeamPulseServer
+        :type config: dict
+        :type default_interaction_config: dict
+        :param session_id: 会话ID
+        :param system: ServerSystem
+        :param config: 会话配置
+        :param default_interaction_config: 默认交互配置
+        """
         self.session_id = session_id
         self.system = system  # type: ECTeamPulseServer
         self.config = config
+        check_session_config(config)
+        self.default_interaction_config = default_interaction_config
+        check_interaction_config(default_interaction_config)
         self.players = []  # type: list[str]
         self.players_can_operate = []  # type: list[str]
         self.next_point_id = 0
@@ -61,7 +76,7 @@ class ServerMarkPointSession:
             }
         )
 
-    def add_player(self, player_id, read_only=False):
+    def add_player(self, player_id, read_only=False, interaction_config=None):
         self.players.append(player_id)
         self.system.player_to_session[player_id] = self.session_id
         if not read_only:
@@ -71,7 +86,8 @@ class ServerMarkPointSession:
             "SetupMarkSession",
             {
                 "session_id": self.session_id,
-                "config": session_config_default,
+                "config": self.config,
+                "interaction_config": self.default_interaction_config if interaction_config is None else interaction_config,
                 "read_only": read_only,
                 "points": [mark_point.to_dict() for mark_point in self.mark_points.values()]
             }
