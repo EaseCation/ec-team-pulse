@@ -154,7 +154,9 @@ class MarkingInteraction(object):
         direction = Vector3(-math.sin(yaw_radians) * math.cos(pitch_radians),
                             -math.sin(pitch_radians),
                             math.cos(yaw_radians) * math.cos(pitch_radians))
-        raycaster = Raycaster(player_pos, direction)
+        entity_whitelist = self.session.config['entity_whitelist'] if self.session.config['entity_whitelist'] else None
+        entity_blacklist = self.session.config['entity_blacklist'] if self.session.config['entity_blacklist'] else None
+        raycaster = Raycaster(player_pos, direction, blacklistEntityIds=entity_blacklist, whitelistEntityIds=entity_whitelist)
         hits = raycaster.raytraceAll()
         if hits:
             for hit in hits:
