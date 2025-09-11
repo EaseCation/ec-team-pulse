@@ -364,9 +364,15 @@ class Raycaster(object):
             if self.blacklistEntityIds and entityId in self.blacklistEntityIds:
                 continue
             posComp = clientApi.GetEngineCompFactory().CreatePos(entityId)
-            entityPos = Vector3(*posComp.GetPos())
+            pos = posComp.GetPos()
+            if pos is None:
+                continue
+            entityPos = Vector3(*pos)
             sizeComp = clientApi.GetEngineCompFactory().CreateCollisionBox(entityId)
-            width, height = sizeComp.GetSize()
+            size = sizeComp.GetSize()
+            if size is None:
+                continue
+            width, height = size
 
             minX = entityPos.x - width / 2
             minY = entityPos.y

@@ -1,0 +1,37 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ec-team-pulse"
+version = "0.1.0"
+description = ""
+authors = [
+    { name = "jju", email = "281147586@qq.com" },
+]
+readme = "README.md"
+requires-python = ">=3.6"
+dependencies = []
+license = "MIT"
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+
+[tool.mcpywrap]
+project_type = "addon"
+target_dir = "./build"
+
+[tool.setuptools.package-dir]
+"" = "behavior_pack_046022d7"
+
+[tool.setuptools.packages.find]
+where = [
+    "behavior_pack_046022d7",
+]
+include = [
+    "*",
+]

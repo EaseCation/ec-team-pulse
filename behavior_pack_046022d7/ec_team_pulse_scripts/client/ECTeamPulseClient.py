@@ -13,6 +13,7 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
         self.listen_event()
         self.level_id = clientApi.GetLevelId()
         self.mark_point_session = None  # type: MarkPointSession | None
+        self.ui_registered = False  # 防止重复注册UI
 
     # 在类初始化的时候开始监听
     def listen_event(self):
@@ -71,9 +72,19 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
         print('==== ECTeamPulseClient 已加载 ====')
 
     def on_ui_init_finished(self, args):
-        clientApi.RegisterUI(mod_name, mark_point_ui_name, mark_point_ui_cls_path, mark_point_ui_def)
-        clientApi.RegisterUI(mod_name, mark_point_ready_ui_name, mark_point_ready_ui_cls_path, mark_point_ready_ui_def)
-        clientApi.RegisterUI(mod_name, mark_hud_ui_name, mark_hud_ui_cls_path, mark_hud_ui_def)
+        # UI初始化完成后必须重新注册基础UI模板才能正常创建动态UI
+        try:
+            # 注意：NetEase clientApi没有UnregisterUI方法，UI会自动管理生命周期
+            # 直接注册基础UI模板（如果已存在会覆盖）
+            clientApi.RegisterUI(mod_name, mark_point_ui_name, mark_point_ui_cls_path, mark_point_ui_def)
+            clientApi.RegisterUI(mod_name, mark_point_ready_ui_name, mark_point_ready_ui_cls_path, mark_point_ready_ui_def)
+            clientApi.RegisterUI(mod_name, mark_hud_ui_name, mark_hud_ui_cls_path, mark_hud_ui_def)
+            self.ui_registered = True
+            print("[ECTeamPulseClient] 基础UI模板注册成功")
+        except Exception as e:
+            print("[ECTeamPulseClient] UI注册失败: {}".format(str(e)))
+            self.ui_registered = False
+        
         self.NotifyToServer("ClientUiInitFinished", {})
         if self.mark_point_session:
             self.mark_point_session.on_client_ui_init_finished()

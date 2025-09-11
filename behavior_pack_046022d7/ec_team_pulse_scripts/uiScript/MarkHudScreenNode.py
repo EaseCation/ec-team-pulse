@@ -2,10 +2,10 @@
 import mod.client.extraClientApi as clientApi
 from mod.common.minecraftEnum import KeyBoardType
 
-try:
-	from ..client.interaction.MarkingInteraction import MarkingInteraction
-except:
-	pass
+# try:
+# 	from ..client.interaction.MarkingInteraction import MarkingInteraction
+# except:
+# 	pass
 
 comp_view = clientApi.GetEngineCompFactory().CreatePlayerView(clientApi.GetLevelId())
 
@@ -26,7 +26,7 @@ key_name_map = {value: name[4:] if name.startswith('KEY_') else name for name, v
 class MarkHudScreenNode(ScreenNode):
 	def __init__(self, namespace, name, param):
 		ScreenNode.__init__(self, namespace, name, param)
-		self.interaction = param['interaction']  # type: MarkingInteraction | None
+		self.interaction = param['interaction']
 
 	def Create(self):
 		"""

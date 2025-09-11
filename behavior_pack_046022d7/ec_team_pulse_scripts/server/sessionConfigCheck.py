@@ -3,6 +3,7 @@
 class SessionConfigFormatError(Exception):
     pass
 
+
 def check_session_config(config):
     required_keys = {
         "entity_whitelist": list,
@@ -40,6 +41,7 @@ def check_session_config(config):
 
 class InteractionConfigFormatError(Exception):
     pass
+
 
 def check_interaction_config(config):
     required_keys = {

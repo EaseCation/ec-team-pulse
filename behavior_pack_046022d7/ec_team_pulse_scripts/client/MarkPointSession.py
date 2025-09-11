@@ -66,14 +66,31 @@ class MarkPointSession(object):
             point.play_sound()
 
     def clear_all(self):
-        for pos, mark_point in self.mark_points.items():
-            mark_point.destroy()
+        # 创建一个副本列表来避免字典修改期间迭代的问题
+        mark_points_to_destroy = list(self.mark_points.items())
+        for point_id, mark_point in mark_points_to_destroy:
+            try:
+                mark_point.destroy()
+            except Exception as e:
+                print("[MarkPointSession] 销毁标点 {} 时出错: {}".format(point_id, str(e)))
         self.mark_points.clear()
+        print("[MarkPointSession] 所有标点已清理完成")
 
     def on_frame_tick(self):
-        for mark_point in self.mark_points.values():
-            if mark_point.ui_node:
+        # 检查并清理过期的标点
+        # 注意：UI已通过定时器自动销毁，这里主要是清理标点数据对象
+        expired_points = []
+        for point_id, mark_point in self.mark_points.items():
+            if mark_point.is_expired():
+                expired_points.append(point_id)
+                print("[MarkPointSession] 标点 {} 已过期，清理数据对象（UI已通过定时器自动销毁）".format(point_id))
+            elif mark_point.ui_node:
                 mark_point.ui_node.on_frame_tick()
+        
+        # 移除过期的标点数据对象
+        for point_id in expired_points:
+            self.remove_point(point_id)
+            
         if self.interaction:
             self.interaction.on_frame_tick()
 

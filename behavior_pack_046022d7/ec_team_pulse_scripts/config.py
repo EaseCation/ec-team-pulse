@@ -24,7 +24,7 @@ session_config_default = {
     "entity_whitelist": [],
     "entity_blacklist": [],
     "mark_type_limit": {
-        "here": 1,
+        "here": 2,
         "danger": 1
     },
     "show_distance_pixels": 20,

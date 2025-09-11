@@ -75,7 +75,11 @@ class MarkPointScreenNode(ScreenNode):
 
 	def pending_destroy(self):
 		self.destroy_time = time.time() + 0.4
-		self.GetBaseUIControl("/stack_panel").SetAnimation("alpha", "mark_point", "global_alpha_ease_out", True)
+		stack_panel = self.GetBaseUIControl("/stack_panel")
+		if stack_panel:
+			stack_panel.SetAnimation("alpha", "mark_point", "global_alpha_ease_out", True)
+		else:
+			print("[MarkPointScreenNode] 警告: 无法获取stack_panel控件，跳过动画")
 
 	def on_frame_tick(self):
 		pass
