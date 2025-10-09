@@ -60,12 +60,24 @@ class ClientMarkPoint(MarkPoint):
                 self.ui_node.session = self.session
                 print("[ClientMarkPoint] 标点UI创建成功: key={}, pos={}".format(self.ui_key, self.pos))
 
-                # 根据标点类型从配置中获取持续时间设置自动销毁定时器
-                def destroy(ui_node):
-                    if ui_node:
-                        ui_node.pending_destroy()
-                        print("[ClientMarkPoint] 定时器自动销毁UI: key={}".format(self.ui_key))
-                
+                # 根据标点类型从配置中获取持续时间设置自动销毁定时器（兜底机制）
+                def destroy_by_timer(mark_point):
+                    """定时器回调：检查并销毁UI（兜底机制）"""
+                    # 检查标点是否已被手动销毁
+                    if mark_point.ui_node is None:
+                        print("[ClientMarkPoint] 定时器发现标点 {} 已被提前销毁，跳过".format(mark_point.point_id))
+                        return
+
+                    # 定时器到期，销毁UI
+                    try:
+                        mark_point.ui_node.pending_destroy()
+                        print("[ClientMarkPoint] 定时器兜底销毁UI: key={}, point_id={}".format(
+                            getattr(mark_point, 'ui_key', 'unknown'), mark_point.point_id))
+                    except Exception as e:
+                        print("[ClientMarkPoint] 定时器销毁UI失败: {}".format(str(e)))
+                    finally:
+                        mark_point.ui_node = None
+
                 comp = clientApi.GetEngineCompFactory().CreateGame(clientApi.GetLevelId())
                 
                 # 从session配置中获取当前标点类型的持续时间
@@ -82,9 +94,9 @@ class ClientMarkPoint(MarkPoint):
                 else:
                     print("[ClientMarkPoint] 无法获取session配置，使用默认{}秒".format(duration))
                 
-                # 设置定时器
-                comp.AddTimer(duration, destroy, self.ui_node)
-                print("[ClientMarkPoint] 已设置{}秒后自动销毁UI".format(duration))
+                # 设置定时器（传递ClientMarkPoint对象，让定时器可以检查销毁状态）
+                comp.AddTimer(duration, destroy_by_timer, self)
+                print("[ClientMarkPoint] 已设置{}秒后定时器兜底销毁UI".format(duration))
 
             else:
                 print("[ClientMarkPoint] UI创建失败 - CreateUI返回None")
@@ -107,17 +119,22 @@ class ClientMarkPoint(MarkPoint):
         return time.time() > self.remove_time
 
     def destroy(self):
-        # 注意：UI已通过定时器自动销毁（3秒后），这里只需要清理引用
-        # 定时器会调用ui_node.pending_destroy()，所以不需要手动调用
+        # 立即销毁UI，不依赖定时器
+        # 当服务端主动移除标点时（如超过数量限制），需要立即清理UI
         if self.ui_node:
-            print("[ClientMarkPoint] 标点UI将通过定时器自动销毁: key={}".format(getattr(self, 'ui_key', 'unknown')))
-            self.ui_node = None
-        
+            try:
+                self.ui_node.pending_destroy()
+                print("[ClientMarkPoint] 标点UI已立即销毁: key={}".format(getattr(self, 'ui_key', 'unknown')))
+            except Exception as e:
+                print("[ClientMarkPoint] 销毁UI时出错: {}".format(str(e)))
+            finally:
+                self.ui_node = None
+
         # 清理UI key引用
         if hasattr(self, 'ui_key') and self.ui_key:
-            print("[ClientMarkPoint] UI key {} 已标记销毁".format(self.ui_key))
+            print("[ClientMarkPoint] UI key {} 已清理".format(self.ui_key))
             self.ui_key = None
-        
-        # 清理调试信息
-        print("[ClientMarkPoint] 标点 {} 已销毁 (类型: {}, 创建者: {}) - UI将通过定时器自动清理".format(
+
+        # 调试信息
+        print("[ClientMarkPoint] 标点 {} 已销毁 (类型: {}, 创建者: {})".format(
             self.point_id, self.mark_type, self.owner))

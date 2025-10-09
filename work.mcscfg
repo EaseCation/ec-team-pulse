@@ -5,7 +5,7 @@
   "Versions": [],
   "JavaType": 7,
   "Name": "ec-team-pulse",
-  "UpdateTime": "2024-12-16T09:20:13.1538609+08:00",
+  "UpdateTime": "2024-12-30T14:50:15.9643818+08:00",
   "IconName": null,
   "Md5": null,
   "CloudMd5": null,
@@ -52,7 +52,7 @@
   "TestExperimentalModding": false,
   "TestStartWithMap": false,
   "SelectComponents": [
-    "d0b90de86faf46b3bb301872df99b190",
+    "84596a1681814550b6090ba45a016bad",
     "ed35f7c79e0d4ad5accfe0b796b52ca8"
   ],
   "isSlim": false,

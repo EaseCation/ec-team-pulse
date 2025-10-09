@@ -20,7 +20,7 @@ class InteractionMouseKeyboard:
     def destroy(self):
         self.interaction.session.client.UnListenForEvent(
             clientApi.GetEngineNamespace(), clientApi.GetEngineSystemName(),
-            'RightClickBeforeClientEvent',
+            'OnMouseMiddleDownClientEvent',
             self, self.on_mouse_middle_down
         )
         self.interaction.session.client.UnListenForEvent(
