@@ -5,6 +5,7 @@ import mod.client.extraClientApi as clientApi
 from ..MarkPoint import MarkPoint
 from ..config import *
 from .MarkPointSession import MarkPointSession
+from .UIKeyPool import UIKeyPool
 
 
 class ECTeamPulseClient(clientApi.GetClientSystemCls()):
@@ -14,6 +15,9 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
         self.level_id = clientApi.GetLevelId()
         self.mark_point_session = None  # type: MarkPointSession | None
         self.ui_registered = False  # 防止重复注册UI
+
+        # 初始化全局UIKey对象池（跨所有session复用）
+        self.ui_key_pool = UIKeyPool(mod_name, mark_point_ui_cls_path, mark_point_ui_def)
 
     # 在类初始化的时候开始监听
     def listen_event(self):
@@ -76,7 +80,7 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
         try:
             # 注意：NetEase clientApi没有UnregisterUI方法，UI会自动管理生命周期
             # 直接注册基础UI模板（如果已存在会覆盖）
-            clientApi.RegisterUI(mod_name, mark_point_ui_name, mark_point_ui_cls_path, mark_point_ui_def)
+            # clientApi.RegisterUI(mod_name, mark_point_ui_name, mark_point_ui_cls_path, mark_point_ui_def)
             clientApi.RegisterUI(mod_name, mark_point_ready_ui_name, mark_point_ready_ui_cls_path, mark_point_ready_ui_def)
             clientApi.RegisterUI(mod_name, mark_hud_ui_name, mark_hud_ui_cls_path, mark_hud_ui_def)
             self.ui_registered = True

@@ -24,6 +24,10 @@ class MarkPointScreenNode(ScreenNode):
 		self.color = param['color']
 		self.destroy_time = 0
 
+		# 保存ui_key和client引用，供Destroy时归还到对象池
+		self.ui_key = param.get('ui_key')
+		self.client = param.get('client')
+
 
 	def Create(self):
 		"""
@@ -88,7 +92,13 @@ class MarkPointScreenNode(ScreenNode):
 		"""
 		@description UI销毁时调用
 		"""
-		pass
+		# 在UI真正销毁时归还ui_key到对象池
+		if self.ui_key and self.client and hasattr(self.client, 'ui_key_pool'):
+			success = self.client.ui_key_pool.release(self.ui_key)
+			if success:
+				print("[MarkPointScreenNode] UI key {} 已归还到对象池".format(self.ui_key))
+			else:
+				print("[MarkPointScreenNode] UI key {} 归还失败".format(self.ui_key))
 
 	def OnActive(self):
 		"""

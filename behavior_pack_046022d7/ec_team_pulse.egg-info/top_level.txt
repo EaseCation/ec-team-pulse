@@ -1,2 +1,0 @@
-ec_team_pulse_scripts
-entities

@@ -24,27 +24,20 @@ class ClientMarkPoint(MarkPoint):
         self.session = session  # type: MarkPointSession
         self.sound_config = sound_config
         self.ui_node = None  # type: MarkPointScreenNode | None
+        self.ui_key = None  # type: str | None
 
     def show(self):
         try:
-            # 使用时间戳确保UI key的唯一性，避免重复注册冲突
-            import time
-            timestamp = int(time.time() * 1000000)  # 微秒级时间戳
-            self.ui_key = "waypoint_{}_{}_{}".format(self.mark_type, self.point_id, timestamp)
-            
-            # 检查UI是否已注册，如果已注册则先注销
-            try:
-                clientApi.RegisterUI(mod_name, self.ui_key, mark_point_ui_cls_path, mark_point_ui_def)
-                print("[ClientMarkPoint] UI key {} 注册成功".format(self.ui_key))
-            except Exception as reg_e:
-                print("[ClientMarkPoint] UI注册失败: {} - 尝试不同的key".format(str(reg_e)))
-                # 如果注册失败，使用随机数作为备用方案
-                import random
-                random_suffix = random.randint(100000, 999999)
-                self.ui_key = "waypoint_{}_{}_{}_{}".format(self.mark_type, self.point_id, timestamp, random_suffix)
-                clientApi.RegisterUI(mod_name, self.ui_key, mark_point_ui_cls_path, mark_point_ui_def)
-                print("[ClientMarkPoint] 备用UI key {} 注册成功".format(self.ui_key))
-            
+            # 从对象池获取ui_key（替代原有的时间戳生成方式）
+            if not self.session or not self.session.client or not hasattr(self.session.client, 'ui_key_pool'):
+                print("[ClientMarkPoint] 错误: client或ui_key_pool未初始化")
+                return
+
+            self.ui_key = self.session.client.ui_key_pool.acquire()
+            if not self.ui_key:
+                print("[ClientMarkPoint] 错误: 无法从对象池获取ui_key")
+                return
+
             self.ui_node = clientApi.CreateUI(
                 mod_name,
                 self.ui_key,
@@ -53,7 +46,9 @@ class ClientMarkPoint(MarkPoint):
                     "autoScale": 1,
                     "bindWorldPosition": (comp_game.GetCurrentDimension(), (self.pos[0], self.pos[1], self.pos[2])),
                     "color": self.color,
-                    "texture": self.texture
+                    "texture": self.texture,
+                    "ui_key": self.ui_key,  # 传递ui_key供Destroy时归还
+                    "client": self.session.client  # 传递client引用
                 }
             )
             if self.ui_node:
@@ -65,7 +60,6 @@ class ClientMarkPoint(MarkPoint):
                     """定时器回调：检查并销毁UI（兜底机制）"""
                     # 检查标点是否已被手动销毁
                     if mark_point.ui_node is None:
-                        print("[ClientMarkPoint] 定时器发现标点 {} 已被提前销毁，跳过".format(mark_point.point_id))
                         return
 
                     # 定时器到期，销毁UI
@@ -87,16 +81,10 @@ class ClientMarkPoint(MarkPoint):
                     for mark_config in marks:
                         if mark_config.get('type') == self.mark_type:
                             duration = float(mark_config.get('duration', 30))
-                            print("[ClientMarkPoint] 从配置获取标点类型 {} 的持续时间: {}秒".format(self.mark_type, duration))
                             break
-                    else:
-                        print("[ClientMarkPoint] 未找到标点类型 {} 的配置，使用默认{}秒".format(self.mark_type, duration))
-                else:
-                    print("[ClientMarkPoint] 无法获取session配置，使用默认{}秒".format(duration))
                 
                 # 设置定时器（传递ClientMarkPoint对象，让定时器可以检查销毁状态）
                 comp.AddTimer(duration, destroy_by_timer, self)
-                print("[ClientMarkPoint] 已设置{}秒后定时器兜底销毁UI".format(duration))
 
             else:
                 print("[ClientMarkPoint] UI创建失败 - CreateUI返回None")
@@ -130,10 +118,9 @@ class ClientMarkPoint(MarkPoint):
             finally:
                 self.ui_node = None
 
-        # 清理UI key引用
-        if hasattr(self, 'ui_key') and self.ui_key:
-            print("[ClientMarkPoint] UI key {} 已清理".format(self.ui_key))
-            self.ui_key = None
+        # ui_key的归还由MarkPointScreenNode的Destroy生命周期函数处理
+        # 这样可以确保在UI真正从引擎中移除后才归还，避免冲突
+        self.ui_key = None
 
         # 调试信息
         print("[ClientMarkPoint] 标点 {} 已销毁 (类型: {}, 创建者: {})".format(

@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
-from mod.client.system.clientSystem import ClientSystem
 
 from .ClientMarkPoint import ClientMarkPoint
 from .interaction.MarkingInteraction import MarkingInteraction
 from ..MarkPoint import MarkPoint
 
+if False:
+    from .ECTeamPulseClient import ECTeamPulseClient
+
 class MarkPointSession(object):
 
     def __init__(self, client, session_id, config, interaction_config, read_only):
-        self.client = client  # type: ClientSystem
+        self.client = client  # type: ECTeamPulseClient
         self.session_id = session_id
         self.config = config  # type: dict
         self.interaction_config = interaction_config  # type: dict
         self.read_only = read_only
         self.mark_points = {}  # type: dict[int, ClientMarkPoint]
+
         if not self.read_only:
             self.interaction = MarkingInteraction(self)
         else:

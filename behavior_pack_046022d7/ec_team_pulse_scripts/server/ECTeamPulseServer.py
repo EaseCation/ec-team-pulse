@@ -5,9 +5,6 @@ import mod.server.extraServerApi as serverApi
 from .ServerMarkPointSession import ServerMarkPointSession
 from ..config import *
 
-def get_system():
-    # type: () -> ECTeamPulseServer
-    return serverApi.GetSystem(mod_name, server_system_name)
 
 class ECTeamPulseServer(serverApi.GetServerSystemCls()):
     def __init__(self, namespace, name):
@@ -60,6 +57,5 @@ class ECTeamPulseServer(serverApi.GetServerSystemCls()):
         print("[ECTeamPulseServer] 标点session已创建")
 
     def on_client_ui_init_finished(self, args):
-        # 只有在标点功能启用时才自动添加玩家到session
         for session in self.sessions.values():
             session.add_player(args['__id__'])
