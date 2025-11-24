@@ -2,23 +2,23 @@
   "modules": [
     {
       "description": "ECTeamPulse",
-      "type": "resources",
-      "uuid": "fe552226-8900-4f79-a5e0-ef0510b2c062",
+      "type": "data",
+      "uuid": "b2904422-1a81-437d-9f73-3bcb02eec0cc",
       "version": [
         0,
         0,
-        3
+        8
       ]
     }
   ],
   "header": {
     "description": "ECTeamPulse",
-    "name": "resource_pack",
-    "uuid": "9c7aeba1-f61e-453e-ac1d-148eaa7df3b1",
+    "name": "behavior_pack",
+    "uuid": "046022d7-95ce-4881-b49d-0884139dcd47",
     "version": [
       0,
       0,
-      3
+      8
     ],
     "min_engine_version": [
       1,
@@ -26,5 +26,6 @@
       0
     ]
   },
-  "format_version": 1
+  "dependencies": [],
+  "format_version": 2
 }
