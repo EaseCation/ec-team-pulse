@@ -68,5 +68,7 @@ session_config_default = {
 interaction_config_default = {
     "touch_mark_button_offset": [ -80.0, 40.0 ],
     "keyboard_switch": KeyBoardType.KEY_TAB,
+    "keyboard_hold": KeyBoardType.KEY_MOUSE_Middle,
+    "show_mark_points": True,
     "gamepad_hold": [GamepadKeyType.KEY_RS]  # 支持同时按下多个按键来触发
 }
