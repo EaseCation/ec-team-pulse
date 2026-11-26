@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import mod.client.extraClientApi as clientApi
 from mod.common.minecraftEnum import KeyBoardType
+from .HudLayout import apply_button_layout
 
 # try:
 # 	from ..client.interaction.MarkingInteraction import MarkingInteraction
@@ -19,6 +20,11 @@ path_select_stack = path_select + "/mark_type_select_stack"
 path_select_current = path_select + "/mark_type_select_current"
 path_select_tip = path_select + "/mark_type_select_tip"
 
+# 自定义按钮布局的 key 与 mark_hud.json 中的默认尺寸（按钮及其图标子控件 image）
+LAYOUT_KEY_MARK = "team_pulse.mark"
+MARK_BUTTON_DEFAULT_SIZE = (10.0, 10.0)
+MARK_BUTTON_EXTRA_CHILDREN = {"image": (4.0, 7.0)}
+
 # 键盘Key枚举到名称映射
 key_name_map = {value: name[4:] if name.startswith('KEY_') else name for name, value in KeyBoardType.__dict__.items() if not name.startswith('__')}
 
@@ -34,7 +40,11 @@ class MarkHudScreenNode(ScreenNode):
 		"""
 		btn_control = self.GetBaseUIControl(path_btn)
 		if btn_control:
-			touch_mark_button_offset = self.interaction.session.interaction_config['touch_mark_button_offset']
+			# 玩家本地保存了标点按钮布局时以本地为准，否则沿用服务端下发的偏移
+			if apply_button_layout(self, path_btn, LAYOUT_KEY_MARK, MARK_BUTTON_DEFAULT_SIZE, MARK_BUTTON_EXTRA_CHILDREN):
+				touch_mark_button_offset = None
+			else:
+				touch_mark_button_offset = self.interaction.session.interaction_config['touch_mark_button_offset']
 			if touch_mark_button_offset:
 				btn_control.SetFullPosition('x', {"absoluteValue": touch_mark_button_offset[0]})
 				btn_control.SetFullPosition('y', {"absoluteValue": touch_mark_button_offset[1]})
