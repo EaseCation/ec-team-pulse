@@ -54,9 +54,9 @@ class InteractionGamepad(object):
                 # 如果现在所有按键都按下，但还没有标记 _was_all_down，则触发 on_down
                 if not self._was_all_down:
                     self._was_all_down = True
-                    self.interaction.on_down(force_show_ready_ui=True, show_tip=True)
+                    self.interaction.on_down(self, force_show_ready_ui=True, show_tip=True)
             else:
                 # 如果不是全部按下，但是 _was_all_down 为真，说明从「全部按下」转变为「松开某一个」
                 if self._was_all_down and not is_down:
-                    self.interaction.on_up()
+                    self.interaction.on_up(self)
                     self._was_all_down = False

@@ -7,6 +7,7 @@ class InteractionMouseKeyboard:
 
     def __init__(self, interaction):
         self.interaction = interaction
+        self._hold_key_down = False
         self.interaction.session.client.ListenForEvent(
             clientApi.GetEngineNamespace(), clientApi.GetEngineSystemName(),
             'OnMouseMiddleDownClientEvent',
@@ -30,13 +31,27 @@ class InteractionMouseKeyboard:
         )
 
     def on_mouse_middle_down(self, args):
-        is_down = args['isDown'] == 1 or args['isDown'] == '1'
+        if self.interaction.session.interaction_config['keyboard_hold'] != KeyBoardType.KEY_MOUSE_Middle:
+            return
+        self._on_hold_key(args['isDown'] in (1, '1'))
+
+    def _on_hold_key(self, is_down, can_start=True):
+        # Consume the press even if another input already owns the selection.
+        if self._hold_key_down == is_down:
+            return
+        self._hold_key_down = is_down
         if is_down:
-            self.interaction.on_down(show_tip=False)
+            if can_start:
+                self.interaction.on_down(self, show_tip=False)
         else:
-            self.interaction.on_up()
+            self.interaction.on_up(self)
 
     def on_key_press_in_game(self, args):
+        hold_key = self.interaction.session.interaction_config['keyboard_hold']
+        if hold_key != KeyBoardType.KEY_MOUSE_Middle and args['key'] == str(hold_key):
+            is_down = args['isDown'] in (1, '1')
+            self._on_hold_key(is_down, can_start=args.get('screenName') == 'hud_screen')
+            return
         if not self.interaction.holding:
             return
         if args['key'] != str(self.interaction.session.interaction_config['keyboard_switch']) or args['screenName'] != 'hud_screen':

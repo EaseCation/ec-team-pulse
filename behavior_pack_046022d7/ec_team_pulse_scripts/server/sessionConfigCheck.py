@@ -47,6 +47,8 @@ def check_interaction_config(config):
     required_keys = {
         "touch_mark_button_offset": list,
         "keyboard_switch": int,
+        "keyboard_hold": int,
+        "show_mark_points": bool,
         "gamepad_hold": list
     }
 

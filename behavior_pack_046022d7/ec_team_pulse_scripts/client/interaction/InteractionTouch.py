@@ -9,7 +9,7 @@ class InteractionTouch:
         pass
 
     def on_btn_touch_down(self, args):
-        self.interaction.on_down(force_show_ready_ui=True)
+        self.interaction.on_down(self, force_show_ready_ui=True)
 
     def on_btn_touch_up(self, args):
-        self.interaction.on_up()
+        self.interaction.on_up(self)

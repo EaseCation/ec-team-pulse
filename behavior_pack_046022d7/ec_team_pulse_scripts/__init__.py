@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 if False:
     from .server.ECTeamPulseServer import ECTeamPulseServer
     from .server.ServerMarkPointSession import ServerMarkPointSession

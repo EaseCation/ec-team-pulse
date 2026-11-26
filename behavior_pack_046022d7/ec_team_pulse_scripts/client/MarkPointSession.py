@@ -52,6 +52,8 @@ class MarkPointSession(object):
         :param play_sound: 是否播放音效
         :type point: MarkPoint
         """
+        if not self.interaction_config['show_mark_points']:
+            return
         point_config = None
         for config in self.config['marks']:
             if config['type'] == point.mark_type:
