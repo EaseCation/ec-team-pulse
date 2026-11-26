@@ -8,12 +8,20 @@ from .MarkPointSession import MarkPointSession
 from .UIKeyPool import UIKeyPool
 
 
+BEDWARS_MARK_POINT_SOUNDS = frozenset((
+    "quicktalk.point.goto", "quicktalk.point.warning", "quicktalk.point.attack",
+))
+
+
 class ECTeamPulseClient(clientApi.GetClientSystemCls()):
     def __init__(self, namespace, name):
         super(ECTeamPulseClient, self).__init__(namespace, name)
         self.listen_event()
         self.level_id = clientApi.GetLevelId()
         self.mark_point_session = None  # type: MarkPointSession | None
+        self.mark_point_preferences = {
+            key: interaction_config_default[key] for key in ("keyboard_hold", "show_mark_points")
+        }
         self.ui_registered = False  # 防止重复注册UI
 
         # 初始化全局UIKey对象池（跨所有session复用）
@@ -27,9 +35,15 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
         self.ListenForEvent(clientApi.GetEngineNamespace(), clientApi.GetEngineSystemName(),
                             'UiInitFinished',
                             self, self.on_ui_init_finished)
+        self.ListenForEvent(clientApi.GetEngineNamespace(), clientApi.GetEngineSystemName(),
+                            "PlaySoundClientEvent",
+                            self, self.on_play_sound)
         self.ListenForEvent(mod_name, server_system_name,
                             "SetupMarkSession",
                             self, self.on_setup_session)
+        self.ListenForEvent(mod_name, server_system_name,
+                            "SyncMarkPointPreferences",
+                            self, self.on_sync_mark_point_preferences)
         self.ListenForEvent(mod_name, server_system_name,
                             "MarkPointAdd",
                             self, self.on_mark_point_add)
@@ -51,9 +65,15 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
         self.UnListenForEvent(clientApi.GetEngineNamespace(), clientApi.GetEngineSystemName(),
                                 "UiInitFinished",
                                 self, self.on_ui_init_finished)
+        self.UnListenForEvent(clientApi.GetEngineNamespace(), clientApi.GetEngineSystemName(),
+                              "PlaySoundClientEvent",
+                              self, self.on_play_sound)
         self.UnListenForEvent(mod_name, server_system_name,
                                 "SetupMarkSession",
                                 self, self.on_setup_session)
+        self.UnListenForEvent(mod_name, server_system_name,
+                                "SyncMarkPointPreferences",
+                                self, self.on_sync_mark_point_preferences)
         self.UnListenForEvent(mod_name, server_system_name,
                                 "MarkPointAdd",
                                 self, self.on_mark_point_add)
@@ -69,6 +89,9 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
 
     # 在Destroy中调用反注册取消监听
     def Destroy(self):
+        if self.mark_point_session:
+            self.mark_point_session.destroy()
+            self.mark_point_session = None
         self.un_listen_event()
         print('==== ECTeamPulseClient 完成反注册 ====')
 
@@ -93,13 +116,27 @@ class ECTeamPulseClient(clientApi.GetClientSystemCls()):
         if self.mark_point_session:
             self.mark_point_session.on_client_ui_init_finished()
 
+    def on_sync_mark_point_preferences(self, args):
+        # 旧服不发送这两个字段。设置跟随本次连接，对局结束后仍要保留。
+        for key in self.mark_point_preferences:
+            if key in args:
+                self.mark_point_preferences[key] = args[key]
+
+    def on_play_sound(self, args):
+        # 旧版起床战争还会单独发送标点语音。
+        if not self.mark_point_preferences["show_mark_points"] and args["name"] in BEDWARS_MARK_POINT_SOUNDS:
+            args["cancel"] = True
+
     def on_setup_session(self, args):
         if self.mark_point_session:
             self.mark_point_session.destroy()
         session_id = args['session_id']
         config = args['config']
+        server_interaction_config = args['interaction_config']
+        self.on_sync_mark_point_preferences(server_interaction_config)
         interaction_config = interaction_config_default.copy()
-        interaction_config.update(args['interaction_config'])
+        interaction_config.update(server_interaction_config)
+        interaction_config.update(self.mark_point_preferences)
         read_only = args['read_only']
         self.mark_point_session = MarkPointSession(self, session_id, config, interaction_config, read_only)
         self.mark_point_session.init_points(args['points'])
