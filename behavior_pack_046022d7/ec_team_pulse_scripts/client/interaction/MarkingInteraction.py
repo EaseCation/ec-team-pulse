@@ -43,7 +43,7 @@ class MarkingInteraction(object):
             }
         )  # type: ScreenNode | MarkHudScreenNode | None
 
-        self.holding = False
+        self._hold_source = None
         self.holding_mark_type_index = self.session.config['mark_index_single_click']  # type: int
         self.holding_mark_type_auto = True
         self.point_ready_ui = None  # type: MarkPointReadyScreenNode | None
@@ -54,6 +54,10 @@ class MarkingInteraction(object):
         self.mouse_keyboard = InteractionMouseKeyboard(self)
         self.touch = InteractionTouch(self)
         self.gamepad = InteractionGamepad(self)
+
+    @property
+    def holding(self):
+        return self._hold_source is not None
 
     def destroy(self):
         self.session.client.UnListenForEvent(
@@ -90,8 +94,10 @@ class MarkingInteraction(object):
             args
         )
 
-    def on_down(self, force_show_ready_ui=False, show_tip=True):
-        self.holding = True
+    def on_down(self, source, force_show_ready_ui=False, show_tip=True):
+        if self.holding:
+            return
+        self._hold_source = source
         if self.hud_ui:
             self.hud_ui.show_select()
         now = time.time()
@@ -108,8 +114,10 @@ class MarkingInteraction(object):
 
             self.create_point_ready_ui(pos, show_tip)
 
-    def on_up(self):
-        self.holding = False
+    def on_up(self, source):
+        if self._hold_source is not source:
+            return
+        self._hold_source = None
         if self.hud_ui:
             self.hud_ui.hide_select()
         now = time.time()
