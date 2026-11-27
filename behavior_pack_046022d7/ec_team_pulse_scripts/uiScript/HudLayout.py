@@ -60,22 +60,36 @@ def load_button_layout(key):
 		return None
 
 
+# 界面的全屏层：部分 mod 界面的 GetGlobalPosition 整体带有平移误差，相对同一界面的全屏层计算即可抵消
+_FULLSCREEN_PATH = "/variables_button_mappings_and_controls"
+
+
+def _global_position(screen, path):
+	try:
+		control = screen.GetBaseUIControl(path)
+		position = control.GetGlobalPosition() if control else None
+		if position is None:
+			return None
+		x, y = float(position[0]), float(position[1])
+	except Exception:
+		return None
+	if x != x or y != y:
+		return None
+	return x, y
+
+
 def _parent_global_position(screen, control_path):
-	"""父控件左上角的全屏坐标；父控件为全屏根或接口不可用时取 (0, 0)。"""
+	"""父控件左上角相对同一界面全屏层的坐标（即全屏坐标）；父控件为全屏根或接口不可用时取 (0, 0)。"""
 	parent_path = control_path.rsplit("/", 1)[0]
 	if not parent_path:
 		return 0.0, 0.0
-	try:
-		parent = screen.GetBaseUIControl(parent_path)
-		position = parent.GetGlobalPosition() if parent else None
-		if position is None:
-			return 0.0, 0.0
-		parent_x, parent_y = float(position[0]), float(position[1])
-	except Exception:
+	parent = _global_position(screen, parent_path)
+	if parent is None:
 		return 0.0, 0.0
-	if parent_x != parent_x or parent_y != parent_y:
-		return 0.0, 0.0
-	return parent_x, parent_y
+	layer = _global_position(screen, _FULLSCREEN_PATH)
+	if layer is None:
+		return parent
+	return parent[0] - layer[0], parent[1] - layer[1]
 
 
 def apply_button_layout(screen, button_path, key, default_size, extra_children=None):
